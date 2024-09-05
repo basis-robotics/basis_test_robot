@@ -18,11 +18,14 @@ handlers:
   OnCameraImage:
     sync:
       type: all
-
-    inputs:
-      /dummy_required_because_reasons:
-        type: raw:int
+      # We can't quite hit 30 fps, probably due to poor coding of this unit
+      # Ideally it shouldn't matter and we occasionally drop a frame, but we need controls to not overload the callback buffer and have multiple rate subscriber callbacks in flight
+      # This still also really wants type:external as it blocks
+      #rate: 0.03333333333
+      rate: 0.05
+      
+      
     outputs:
-      /difference_image:
+      /camera_image:
         type: protobuf:foxglove.RawImage
-
+        optional: True
