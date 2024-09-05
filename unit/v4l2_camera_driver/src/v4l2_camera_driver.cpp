@@ -85,7 +85,7 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
     fmt.index++;
   }
   
-  // Enforce 640x480 because slow USB?
+  // Enforce 640x480 as large messages aren't happy yet over TCP
   // imageFormat.fmt.pix.width = 640;
   // imageFormat.fmt.pix.height = 480;
 
