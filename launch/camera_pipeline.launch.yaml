@@ -1,0 +1,9 @@
+recording:
+  directory: /tmp/
+  # list of glob expressions to match topics to
+  topics:
+    - '*'
+processes:
+  webcam:
+    units:
+      v4l2_camera_driver: {}

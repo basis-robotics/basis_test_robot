@@ -1,0 +1,28 @@
+# TODO: don't do this, use the file name?
+# the default name of the unit
+# name: example
+
+# The ways handlers are allowed to interact with eachother 
+threading_model:
+  # single - by default all handlers run mutually exclusive from eachother
+  # multi - by default all handlers run in parallel
+  single
+cpp_includes:
+  - foxglove/RawImage.pb.h
+#   - sensor_msgs/Image.h
+#   - sensor_msgs/PointCloud2.h
+#   - test.pb.h
+#   - basis_example.pb.h
+
+handlers:
+  OnCameraImage:
+    sync:
+      type: all
+
+    inputs:
+      /dummy_required_because_reasons:
+        type: raw:int
+    outputs:
+      /difference_image:
+        type: protobuf:foxglove.RawImage
+
