@@ -9,10 +9,7 @@ threading_model:
   single
 cpp_includes:
   - foxglove/RawImage.pb.h
-#   - sensor_msgs/Image.h
-#   - sensor_msgs/PointCloud2.h
-#   - test.pb.h
-#   - basis_example.pb.h
+  - image_conversion.h
 
 handlers:
   OnCameraImage:
@@ -26,6 +23,9 @@ handlers:
       
       
     outputs:
-      /camera_image:
+      /camera/yuyv:
         type: protobuf:foxglove.RawImage
         optional: True
+      /camera/yuyv/cuda:
+        type: raw:image_conversion::CudaManagedImage
+        optional: False

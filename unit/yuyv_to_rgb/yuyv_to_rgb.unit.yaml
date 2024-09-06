@@ -1,0 +1,25 @@
+# TODO: don't do this, use the file name?
+# the default name of the unit
+# name: example
+
+# The ways handlers are allowed to interact with eachother 
+threading_model:
+  # single - by default all handlers run mutually exclusive from eachother
+  # multi - by default all handlers run in parallel
+  single
+cpp_includes:
+  - foxglove/RawImage.pb.h
+  - image_conversion.h
+
+handlers:
+  OnYUYV:
+    sync:
+      type: all      
+    inputs:
+      /camera/yuyv/cuda:
+        type: raw:image_conversion::CudaManagedImage
+    outputs:
+      /camera/rgb/cuda:
+        type: raw:image_conversion::CudaManagedImage
+      /camera/rgb:
+        type: protobuf:foxglove.RawImage

@@ -8,11 +8,14 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#include <image_conversion.h>
+
 #include <v4l2_camera_driver.h>
+
 
 // Adapted from
 // https://gist.github.com/sammy17/b391c68a91f381aad0d149e325e6a87e
-
+// TODO: translate these
 // v4l2-ctl -d /dev/video0 -c exposure_auto=1
 // v4l2-ctl -d /dev/video0 -c exposure_absolute=400
 
@@ -86,8 +89,8 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
   }
   
   // Enforce 640x480 as large messages aren't happy yet over TCP
-  // imageFormat.fmt.pix.width = 640;
-  // imageFormat.fmt.pix.height = 480;
+  imageFormat.fmt.pix.width = 640;
+  imageFormat.fmt.pix.height = 480;
 
 
   if (imageFormat.fmt.pix.width == 0) {
@@ -235,27 +238,12 @@ OnCameraImage::Output v4l2_camera_driver::OnCameraImage(const OnCameraImage::Inp
       return {};
     }
 
-
-    auto image_msg = std::make_shared<foxglove::RawImage>();
-
-    const timespec ts = input.time.ToTimespec();
-
-    image_msg->mutable_timestamp()->set_seconds(ts.tv_sec);
-    image_msg->mutable_timestamp()->set_nanos(ts.tv_nsec);
-    image_msg->set_frame_id("webcam");
-    image_msg->set_encoding("yuyv");
-    image_msg->set_width(imageFormat.fmt.pix.width);
-    image_msg->set_height(imageFormat.fmt.pix.height);
-    image_msg->set_step(imageFormat.fmt.pix.width * 2); // 4 bytes = 2 pixels
-    image_msg->set_data(camera_buffers[current_index], buffer_infos[current_index].bytesused);
-
-    /******************************** end looping here **********************/
-    output.camera_image = std::move(image_msg);
+    output.camera_yuyv_cuda = std::make_shared<image_conversion::CudaManagedImage>(image_conversion::PixelFormat::YUV422, (size_t)imageFormat.fmt.pix.width, (size_t)imageFormat.fmt.pix.height,  input.time, (std::byte*)camera_buffers[current_index]);
+    output.camera_yuyv = output.camera_yuyv_cuda->ToFoxglove();
 
     if (!Queue(current_index)) {
       BASIS_LOG_ERROR("Could not queue buffer, VIDIOC_QBUF");
       CloseCamera();
-      return {};
     }
   }
   return output;
