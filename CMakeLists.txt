@@ -13,5 +13,6 @@ add_subdirectory(/basis/ basis)
 
 add_subdirectory(lib/image_conversion)
 
+add_subdirectory(unit/resnet_demo)
 add_subdirectory(unit/v4l2_camera_driver)
 add_subdirectory(unit/yuyv_to_rgb)

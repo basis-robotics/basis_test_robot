@@ -6,5 +6,6 @@ recording:
 processes:
   webcam:
     units:
-      v4l2_camera_driver: {}
-      yuyv_to_rgb: {}
+      # v4l2_camera_driver: {}
+      # yuyv_to_rgb: {}
+      resnet_demo: {}

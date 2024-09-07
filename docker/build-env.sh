@@ -1,7 +1,8 @@
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 BASIS_SOURCE_DIR=${BASIS_SOURCE_DIR:-"$SCRIPT_DIR/../../basis"}
 
-BASE_IMAGE=nvcr.io/nvidia/l4t-cuda:12.2.12-devel
+#BASE_IMAGE=nvcr.io/nvidia/l4t-cuda:12.2.12-devel
+BASE_IMAGE=nvcr.io/nvidia/l4t-tensorrt:r8.6.2-devel
 
 BASIS_ENABLE_ROS=0 ${BASIS_SOURCE_DIR}/docker/build-env.sh  --build-arg BASE_IMAGE=${BASE_IMAGE}
 
