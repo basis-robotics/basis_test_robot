@@ -1,6 +1,6 @@
 
 ONNXRUNTIME_REPO=https://github.com/microsoft/onnxruntime
-ONNXRUNTIME_COMMIT=v1.19.2
+ONNXRUNTIME_COMMIT=v1.18.2
 BUILD_CONFIG=Release
 CPU_ARCHITECTURE=$(uname -m)
 
@@ -8,22 +8,22 @@ cd /tmp/
 
 set -e
 # clone onnxruntime repository and build
-# git clone ${ONNXRUNTIME_REPO} onnxruntime
+git clone ${ONNXRUNTIME_REPO} onnxruntime
 export CC=
 export CXX=
 cd onnxruntime
-# git checkout ${ONNXRUNTIME_COMMIT}
-# ./build.sh \
-#     --parallel \
-#     --build_shared_lib \
-#     --allow_running_as_root \
-#     --cuda_home /usr/local/cuda \
-#     --cudnn_home /usr/lib/${CPU_ARCHITECTURE}-linux-gnu/ \
-#     --use_tensorrt \
-#     --tensorrt_home /usr/lib/${CPU_ARCHITECTURE}-linux-gnu/ \
-#     --config ${BUILD_CONFIG} \
-#     --skip_tests \
-#     --cmake_extra_defines 'onnxruntime_BUILD_UNIT_TESTS=OFF CMAKE_C_COMPILER=gcc CMAKE_CXX_COMPILER=g++'
+git checkout ${ONNXRUNTIME_COMMIT}
+./build.sh \
+    --parallel \
+    --build_shared_lib \
+    --allow_running_as_root \
+    --cuda_home /usr/local/cuda \
+    --cudnn_home /usr/lib/${CPU_ARCHITECTURE}-linux-gnu/ \
+    --use_tensorrt \
+    --tensorrt_home /usr/lib/${CPU_ARCHITECTURE}-linux-gnu/ \
+    --config ${BUILD_CONFIG} \
+    --skip_tests \
+    --cmake_extra_defines 'onnxruntime_BUILD_UNIT_TESTS=OFF CMAKE_C_COMPILER=gcc CMAKE_CXX_COMPILER=g++'
 
 # package and copy to output
 ONNXRUNTIME_VERSION=$(cat /tmp/onnxruntime/VERSION_NUMBER)

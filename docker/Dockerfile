@@ -22,15 +22,17 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
 EOF
 
 # Install the headers and CPU variants
-ARG ONNX_VERSION=1.19.2
-RUN <<EOF
-    cd /tmp
-    wget https://github.com/microsoft/onnxruntime/releases/download/v${ONNX_VERSION}/onnxruntime-linux-aarch64-${ONNX_VERSION}.tgz
-    tar -zxvf onnxruntime-linux-aarch64-${ONNX_VERSION}.tgz -C /usr/ onnxruntime-linux-aarch64-${ONNX_VERSION}/include onnxruntime-linux-aarch64-${ONNX_VERSION}/lib  --strip-components=1
-    rm *.tgz
-EOF
-
-
+# ARG ONNX_VERSION=1.19.2
+# RUN <<EOF
+#     cd /tmp
+#     wget https://github.com/microsoft/onnxruntime/releases/download/v${ONNX_VERSION}/onnxruntime-linux-aarch64-${ONNX_VERSION}.tgz
+#     tar -zxvf onnxruntime-linux-aarch64-${ONNX_VERSION}.tgz -C /usr/ onnxruntime-linux-aarch64-${ONNX_VERSION}/include onnxruntime-linux-aarch64-${ONNX_VERSION}/lib  --strip-components=1
+#     rm *.tgz
+# EOF
+ARG ONNX_VERSION=1.18.2
+RUN --mount=type=bind,source=docker/onnxruntime,target=/tmp/onnxruntime \
+ls /tmp/onnxruntime && \
+    tar -zxvf /tmp/onnxruntime/onnxruntime-linux-aarch64-gpu-${ONNX_VERSION}.tgz -C /usr/ onnxruntime-linux-aarch64-gpu-${ONNX_VERSION}/include onnxruntime-linux-aarch64-gpu-${ONNX_VERSION}/lib  --strip-components=1
 
 # # Jetson only
 # # https://elinux.org/Jetson_Zoo#ONNX_Runtime
