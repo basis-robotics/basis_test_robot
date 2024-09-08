@@ -185,6 +185,8 @@ BASIS_LOG_INFO("Request {} buffers", BUFFER_COUNT);
         (char *)mmap(NULL, queryBuffer.length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, queryBuffer.m.offset);
     memset(camera_buffers[buffer_index], 0, queryBuffer.length);
 
+    BASIS_LOG_INFO("buffer len {}", queryBuffer.length);
+
     // 6. Get a frame
     // Create a new buffer type so the device knows whichbuffer we are talking about
     auto* buffer_info = buffer_infos + buffer_index;
@@ -213,7 +215,7 @@ BASIS_LOG_INFO("Request {} buffers", BUFFER_COUNT);
       return false;
     }
   }
-
+  current_index = BUFFER_COUNT - 1;
   return true;
 }
 

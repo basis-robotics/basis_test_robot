@@ -4,6 +4,17 @@
 #include <string.h>
 #include <memory>
 #include <basis/core/time.h>
+
+#define CUDA_SAFE_CALL_NO_SYNC(call) do {                                \
+    cudaError err = call;                                                    \
+    if( cudaSuccess != err) {                                                \
+        fprintf(stderr, "Cuda error in file '%s' in line %i : %s.\n",        \
+                __FILE__, __LINE__, cudaGetErrorString( err) );              \
+        exit(EXIT_FAILURE);                                                  \
+    } } while (0)
+
+void CheckCudaError();
+
 /*
  Note: this is how it starts - someone writes really basic CUDA code to "just get images working" 
  and then two years later it's still in use, your robot has blocking cuda calls all over the place 
@@ -23,8 +34,9 @@ enum class PixelFormat {
 
 struct CudaManagedImage {
     CudaManagedImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time, std::byte* data = nullptr);
-
-
+    ~CudaManagedImage();
+    CudaManagedImage(const CudaManagedImage&) = delete;
+    CudaManagedImage& operator=(const CudaManagedImage&) = delete;
     size_t StepSize() const {
         switch (pixel_format) {
         case PixelFormat::YUV422:
@@ -47,7 +59,7 @@ struct CudaManagedImage {
     const int width;
     const int height;
     basis::core::MonotonicTime time;
-    std::byte* buffer;
+    std::byte* buffer = nullptr;
 };
 
 

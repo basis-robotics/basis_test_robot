@@ -19,7 +19,9 @@ handlers:
       # Ideally it shouldn't matter and we occasionally drop a frame, but we need controls to not overload the callback buffer and have multiple rate subscriber callbacks in flight
       # This still also really wants type:external as it blocks
       #rate: 0.03333333333
-      rate: 0.05
+      # this no longer works after changes to cuda, the memcopy being blocking is deadly
+      # rate: 0.05
+      rate: 0.1
       
       
     outputs:
