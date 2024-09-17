@@ -10,6 +10,6 @@ else
     docker run -w /basis_test_robot -v $PROJECT_ROOT:/basis_test_robot \
         -v $BASIS_SOURCE_DIR:/basis \
         -v $PROJECT_ROOT/../deterministic_replay:/deterministic_replay \
-        --privileged --runtime=nvidia \
+        --privileged --runtime=nvidia --net=host \
         --name basis --rm -it basis-robot-env /bin/bash $@
 fi

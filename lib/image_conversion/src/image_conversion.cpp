@@ -1,10 +1,12 @@
 #include <foxglove/RawImage.pb.h>
 #include <image_conversion.h>
 #include <nppi_color_conversion.h>
+
 void CheckCudaError() {
   auto e = cudaGetLastError();
   if (e != 0) {
     std::cout << cudaGetErrorString(e) << std::endl;
+    throw e;
   }
 }
 
@@ -15,24 +17,20 @@ CudaManagedImage::CudaManagedImage(PixelFormat pixel_format, int width, int heig
   const size_t size = ImageSize();
   // cudaMalloc3D??
   CUDA_SAFE_CALL_NO_SYNC(cudaMalloc(&buffer, size));
-  
+
   if (data) {
     cudaMemcpy(buffer, data, size, cudaMemcpyHostToDevice);
   }
-  
-
 }
 
 CudaManagedImage::~CudaManagedImage() { CUDA_SAFE_CALL_NO_SYNC(cudaFree(buffer)); }
 std::unique_ptr<CudaManagedImage> YUYV_to_RGB(const CudaManagedImage &image_in) {
   auto rgb = std::make_unique<CudaManagedImage>(PixelFormat::RGB, image_in.width, image_in.height, image_in.time);
-  void *gpu_buff_RGB;
-  void *roi;
-  int width;
+
   auto status = nppiYUV422ToRGB_8u_C2C3R((const Npp8u *)image_in.buffer, image_in.StepSize(), (Npp8u *)rgb->buffer,
                                          rgb->StepSize(), {image_in.width, image_in.height});
   // TODO: logger
-  if (status < 0) {
+  if (status != 0) {
     std::cout << "bad status " << status << std::endl;
     return nullptr;
   }
@@ -63,11 +61,11 @@ std::shared_ptr<foxglove::RawImage> CudaManagedImage::ToFoxglove() const {
   image_msg->set_width(width);
   image_msg->set_height(height);
   image_msg->set_step(StepSize());
-  const auto& data = image_msg->mutable_data();
-  data->reserve(ImageSize());
-  cudaMemcpy( data->data(), buffer, ImageSize(), cudaMemcpyDeviceToHost);
+  const auto &data = image_msg->mutable_data();
+  data->resize(ImageSize());
 
-  //image_msg->set_data(buffer, ImageSize());
+  CUDA_SAFE_CALL_NO_SYNC(cudaMemcpy(data->data(), buffer, ImageSize(), cudaMemcpyDeviceToHost));
+
   return image_msg;
 }
 

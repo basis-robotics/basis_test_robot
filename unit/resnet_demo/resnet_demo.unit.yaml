@@ -9,6 +9,7 @@ threading_model:
   single
 cpp_includes:
   - foxglove/RawImage.pb.h
+  - foxglove/ImageAnnotations.pb.h
   - image_conversion.h
 
 handlers:
@@ -18,3 +19,17 @@ handlers:
     inputs:
       /camera/rgb/cuda:
         type: raw:image_conversion::CudaManagedImage
+        qos:
+          depth: 1
+    outputs:
+      /camera/detections/annotations:
+        type: protobuf:foxglove.ImageAnnotations
+      /camera/inference_buffer/r:
+        type: protobuf:foxglove.RawImage
+        optional: True
+      /camera/inference_buffer/g:
+        type: protobuf:foxglove.RawImage
+        optional: True
+      /camera/inference_buffer/b:
+        type: protobuf:foxglove.RawImage
+        optional: True

@@ -1,11 +1,12 @@
 recording:
   directory: /tmp/
   # list of glob expressions to match topics to
-  #topics:
-  #  - '*'
+  # topics:
+  #   - '*'
 processes:
   webcam:
     units:
+      foxglove: {}
       v4l2_camera_driver: {}
       yuyv_to_rgb: {}
       resnet_demo: {}

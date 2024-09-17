@@ -1,1 +1,0 @@
-void RGBToTensor(const unsigned char *in, float *out, const int w, const int h);

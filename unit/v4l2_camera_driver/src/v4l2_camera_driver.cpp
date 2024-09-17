@@ -89,8 +89,10 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
   }
   
   // Enforce 640x480 as large messages aren't happy yet over TCP
-  imageFormat.fmt.pix.width = 640;
-  imageFormat.fmt.pix.height = 480;
+  //imageFormat.fmt.pix.width = 640;
+  //imageFormat.fmt.pix.height = 480;
+  imageFormat.fmt.pix.width = 1280;
+  imageFormat.fmt.pix.height = 720;
 
 
   if (imageFormat.fmt.pix.width == 0) {
@@ -242,6 +244,8 @@ OnCameraImage::Output v4l2_camera_driver::OnCameraImage(const OnCameraImage::Inp
 
     output.camera_yuyv_cuda = std::make_shared<image_conversion::CudaManagedImage>(image_conversion::PixelFormat::YUV422, (size_t)imageFormat.fmt.pix.width, (size_t)imageFormat.fmt.pix.height,  input.time, (std::byte*)camera_buffers[current_index]);
     output.camera_yuyv = output.camera_yuyv_cuda->ToFoxglove();
+
+    // Note: it looks like sometimes we race between dequeueing and more data filling the buffer
 
     if (!Queue(current_index)) {
       BASIS_LOG_ERROR("Could not queue buffer, VIDIOC_QBUF");

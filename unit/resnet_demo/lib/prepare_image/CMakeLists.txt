@@ -1,0 +1,2 @@
+add_library(prepare_image src/prepare_image.cu)
+target_include_directories(prepare_image PUBLIC include)
