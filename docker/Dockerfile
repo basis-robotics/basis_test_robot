@@ -1,4 +1,5 @@
-FROM basis-env AS basis-robot-env
+ARG BASE_IMAGE=basis-env
+FROM ${BASE_IMAGE} AS basis-robot-env
 
 # TODO: this depends on python, which is a bit sad
 # we can probably untar this instead
@@ -20,8 +21,9 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
     cd /tmp 
     apt-get update
     apt-get -y --no-install-recommends install \
-        tensorrt=8.6.2.3-1+cuda12.2 \
-        libcudnn8-dev
+    tensorrt=8.6.2.3-1+cuda12.2 \
+    libcudnn8-dev
+
 
     # TODO: hardcoded ubuntu22
     wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/sbsa/cuda-keyring_1.1-1_all.deb
