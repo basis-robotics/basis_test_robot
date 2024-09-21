@@ -5,6 +5,7 @@
 */
 
 #include "basis/core/time.h"
+#include "image_conversion.h"
 #include "spdlog/spdlog.h"
 #include <foxglove/ImageAnnotations.pb.h>
 #include <foxglove/Point2.pb.h>
@@ -22,18 +23,20 @@ resnet_demo::resnet_demo(std::optional<std::string> name_override) : unit::resne
       std::make_unique<InferenceYoloV9>("/basis_test_robot/models/yolov8n", "orin", InferenceRunMode::INFERENCE);
 }
 OnRGB::Output resnet_demo::OnRGB(const OnRGB::Input &input) {
-  auto latency = basis::core::MonotonicTime::Now() - input.camera_rgb_cuda->time;
+  std::shared_ptr<image_conversion::CudaManagedImage> image;
+
+  auto latency = basis::core::MonotonicTime::Now() - image->time;
   SPDLOG_DEBUG("Latency is {}", std::to_string(latency.ToSeconds()));
 
   auto before = basis::core::MonotonicTime::Now();
-  auto detections = inference->Infer(*input.camera_rgb_cuda.get());
+  auto detections = inference->Infer(*image.get());
   auto after = basis::core::MonotonicTime::Now();
 
   SPDLOG_DEBUG("Inference took {}", (after - before).ToSeconds());
   // auto [r, g, b] = inference->DumpInferenceBuffer();
   // return {r, g, b};
   auto annotations_msg = std::make_shared<foxglove::ImageAnnotations>();
-  const auto ts = input.camera_rgb_cuda->time.ToTimespec();
+  const auto ts = image->time.ToTimespec();
   auto points_msgs = annotations_msg->mutable_points();
   points_msgs->Reserve(detections.size());
   auto text_msgs = annotations_msg->mutable_points();

@@ -17,8 +17,9 @@ handlers:
     sync:
       type: all      
     inputs:
-      /camera/rgb/cuda:
-        type: raw:image_conversion::CudaManagedImage
+      /camera/rgb:
+        type: protobuf:foxglove.RawImage
+        inproc_type: image_conversion::CudaManagedImage
         qos:
           depth: 1
     outputs:

@@ -25,8 +25,10 @@ handlers:
       
     outputs:
       /camera/yuyv:
+        #type: protobuf:foxglove.RawImage
+        #inproc_type: image_conversion::CudaManagedImage
+        
+        
+        #type: raw:image_conversion::CudaManagedImage
         type: protobuf:foxglove.RawImage
-        optional: True
-      /camera/yuyv/cuda:
-        type: raw:image_conversion::CudaManagedImage
         optional: False

@@ -16,10 +16,10 @@ handlers:
     sync:
       type: all      
     inputs:
-      /camera/yuyv/cuda:
-        type: raw:image_conversion::CudaManagedImage
+      /camera/yuyv:
+        type: protobuf:foxglove.RawImage
+        inproc_type: image_conversion::CudaManagedImage
     outputs:
-      /camera/rgb/cuda:
-        type: raw:image_conversion::CudaManagedImage
       /camera/rgb:
         type: protobuf:foxglove.RawImage
+        inproc_type: image_conversion::CudaManagedImage

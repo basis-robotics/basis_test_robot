@@ -242,8 +242,7 @@ OnCameraImage::Output v4l2_camera_driver::OnCameraImage(const OnCameraImage::Inp
       return {};
     }
 
-    output.camera_yuyv_cuda = std::make_shared<image_conversion::CudaManagedImage>(image_conversion::PixelFormat::YUV422, (size_t)imageFormat.fmt.pix.width, (size_t)imageFormat.fmt.pix.height,  input.time, (std::byte*)camera_buffers[current_index]);
-    output.camera_yuyv = output.camera_yuyv_cuda->ToFoxglove();
+    output.camera_yuyv = (std::make_shared<image_conversion::CudaManagedImage>(image_conversion::PixelFormat::YUV422, (size_t)imageFormat.fmt.pix.width, (size_t)imageFormat.fmt.pix.height,  input.time, (std::byte*)camera_buffers[current_index]))->ToMessage();
 
     // Note: it looks like sometimes we race between dequeueing and more data filling the buffer
 
