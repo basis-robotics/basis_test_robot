@@ -158,7 +158,7 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
   requestBuffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE; // request a buffer wich we an use for capturing frames
   requestBuffer.memory = V4L2_MEMORY_MMAP;
 
-BASIS_LOG_INFO("Request {} buffers", BUFFER_COUNT);
+  BASIS_LOG_INFO("Request {} buffers", BUFFER_COUNT);
   if (ioctl(fd, VIDIOC_REQBUFS, &requestBuffer) < 0) {
     BASIS_LOG_ERROR("Could not request buffer from device, VIDIOC_REQBUFS");
     close(fd);
@@ -186,8 +186,6 @@ BASIS_LOG_INFO("Request {} buffers", BUFFER_COUNT);
     camera_buffers[buffer_index] =
         (char *)mmap(NULL, queryBuffer.length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, queryBuffer.m.offset);
     memset(camera_buffers[buffer_index], 0, queryBuffer.length);
-
-    BASIS_LOG_INFO("buffer len {}", queryBuffer.length);
 
     // 6. Get a frame
     // Create a new buffer type so the device knows whichbuffer we are talking about
@@ -231,7 +229,7 @@ bool v4l2_camera_driver::Dequeue(int index) {
 // TODO: move this to another thread?
 OnCameraImage::Output v4l2_camera_driver::OnCameraImage(const OnCameraImage::Input &input) {
   OnCameraImage::Output output;
-  if (InitializeCamera("/dev/video0")) {
+  if (InitializeCamera(args.device)) {
     current_index++;
     current_index %= BUFFER_COUNT;
 
@@ -242,7 +240,7 @@ OnCameraImage::Output v4l2_camera_driver::OnCameraImage(const OnCameraImage::Inp
       return {};
     }
 
-    output.camera_yuyv = (std::make_shared<image_conversion::CudaManagedImage>(image_conversion::PixelFormat::YUV422, (size_t)imageFormat.fmt.pix.width, (size_t)imageFormat.fmt.pix.height,  input.time, (std::byte*)camera_buffers[current_index]))->ToMessage();
+    output.camera_yuyv = std::make_shared<image_conversion::CudaManagedImage>(image_conversion::PixelFormat::YUV422, (size_t)imageFormat.fmt.pix.width, (size_t)imageFormat.fmt.pix.height,  input.time, (std::byte*)camera_buffers[current_index]);
 
     // Note: it looks like sometimes we race between dequeueing and more data filling the buffer
 

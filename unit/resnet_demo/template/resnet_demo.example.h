@@ -9,7 +9,7 @@
 
 class resnet_demo : public unit::resnet_demo::Base {
 public:
-  resnet_demo(std::optional<std::string> name_override = {}) 
+  resnet_demo(const Args& args, const std::optional<std::string_view>& name_override = {}) 
   : unit::resnet_demo::Base(name_override)
   {}
 

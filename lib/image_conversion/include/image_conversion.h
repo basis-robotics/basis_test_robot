@@ -4,6 +4,7 @@
 #include <string.h>
 #include <memory>
 #include <basis/core/time.h>
+#include <variant>
 
 #define CUDA_SAFE_CALL_NO_SYNC(call) do {                                \
     cudaError err = call;                                                    \
@@ -54,7 +55,11 @@ struct CudaManagedImage {
     }
 
     std::shared_ptr<foxglove::RawImage> ToMessage() const;
-    static std::shared_ptr<image_conversion::CudaManagedImage> FromMessage(foxglove::RawImage* message);
+    static std::shared_ptr<image_conversion::CudaManagedImage> FromMessage(const foxglove::RawImage* message);
+    static std::shared_ptr<const image_conversion::CudaManagedImage> FromVariant(
+        const std::variant<std::monostate,
+            std::shared_ptr<const foxglove::RawImage>,
+            std::shared_ptr<const image_conversion::CudaManagedImage>>& variant);
 
     const PixelFormat pixel_format;
     const int width;

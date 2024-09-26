@@ -1,12 +1,17 @@
 recording:
   directory: /tmp/
   # list of glob expressions to match topics to
-  # topics:
-  #   - '*'
+  topics:
+     - /log
 processes:
   webcam:
     units:
       foxglove: {}
-      v4l2_camera_driver: {}
+      v4l2_camera_driver:
+        args:
+          device: /dev/video0
       yuyv_to_rgb: {}
-      resnet_demo: {}
+      resnet_demo:
+        args:
+          cache_gpu_type_key: orin
+          log_timing: foobar

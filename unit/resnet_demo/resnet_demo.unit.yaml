@@ -1,11 +1,25 @@
-# TODO: don't do this, use the file name?
-# the default name of the unit
-# name: example
+args:
+  model:
+    type: string
+    help: The model name to load
+    default: yolov8n
+  model_directory:
+    type: string
+    help: The directory at which models are stored
+    default: /basis_test_robot/models/
+  force_dump_cache:
+    type: bool
+    help: Force ep context to be dumped to disk
+    default: False
+  cache_gpu_type_key:
+    type: string
+    help: The GPU specific key to use for the cache
+  log_timing:
+    type: bool
+    help: Print timing information to log
+    default: False
 
-# The ways handlers are allowed to interact with eachother 
 threading_model:
-  # single - by default all handlers run mutually exclusive from eachother
-  # multi - by default all handlers run in parallel
   single
 cpp_includes:
   - foxglove/RawImage.pb.h
