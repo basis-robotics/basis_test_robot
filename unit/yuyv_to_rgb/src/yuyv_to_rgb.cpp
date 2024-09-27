@@ -13,7 +13,8 @@
 using namespace unit::yuyv_to_rgb;
 
 OnYUYV::Output yuyv_to_rgb::OnYUYV(const OnYUYV::Input &input) {
-  std::shared_ptr<const image_conversion::CudaManagedImage> yuyv = image_conversion::CudaManagedImage::FromVariant(input.camera_yuyv);
+  std::shared_ptr<const image_conversion::CudaManagedImage> yuyv =
+      image_conversion::CudaManagedImage::FromVariant(input.args_topic_namespace_yuyv);
   std::shared_ptr<image_conversion::CudaManagedImage> rgb = YUYV_to_RGB(*yuyv);
 
   return {rgb};

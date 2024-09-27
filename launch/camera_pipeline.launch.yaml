@@ -1,8 +1,8 @@
 recording:
   directory: /tmp/
   # list of glob expressions to match topics to
-  topics:
-     - /log
+  # topics:
+  #    - /log
 processes:
   webcam:
     units:
@@ -10,8 +10,11 @@ processes:
       v4l2_camera_driver:
         args:
           device: /dev/video0
-      yuyv_to_rgb: {}
+          topic_namespace: "camera"
+      yuyv_to_rgb:
+        args:
+          topic_namespace: "camera"
       resnet_demo:
         args:
           cache_gpu_type_key: orin
-          log_timing: foobar
+          log_timing: False

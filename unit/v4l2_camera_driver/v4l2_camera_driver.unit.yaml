@@ -3,6 +3,9 @@ args:
     type: string
     help: The device to capture from
     default: /dev/video0
+  topic_namespace:
+    type: string
+    default: /camera
 
 threading_model:
   single
@@ -23,6 +26,6 @@ handlers:
       
       
     outputs:
-      /camera/yuyv:
+      "{{args.topic_namespace}}/yuyv":
         type: protobuf:foxglove.RawImage
         inproc_type: image_conversion::CudaManagedImage

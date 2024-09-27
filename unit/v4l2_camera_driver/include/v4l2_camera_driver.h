@@ -3,7 +3,9 @@
 #include <unit/v4l2_camera_driver/unit_base.h>
 class v4l2_camera_driver : public unit::v4l2_camera_driver::Base {
 public:
-  v4l2_camera_driver(const unit::v4l2_camera_driver::Args& args, const std::optional<std::string_view>& name_override = {}) : args(args), unit::v4l2_camera_driver::Base(name_override) {}
+  v4l2_camera_driver(const unit::v4l2_camera_driver::Args &args,
+                     const std::optional<std::string_view> &name_override = {})
+      : args(args), unit::v4l2_camera_driver::Base(args, name_override) {}
 
   ~v4l2_camera_driver();
 
