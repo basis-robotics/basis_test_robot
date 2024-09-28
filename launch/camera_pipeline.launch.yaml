@@ -1,19 +1,26 @@
+---
+args: 
+  camera_topic_namespace2:
+    type: string
+---
 recording:
   directory: /tmp/
   # list of glob expressions to match topics to
   # topics:
   #    - /log
+
 processes:
   webcam:
+    # test
     units:
       foxglove: {}
       v4l2_camera_driver:
         args:
           device: /dev/video0
-          topic_namespace: "camera"
+          topic_namespace: "/camera"
       yuyv_to_rgb:
         args:
-          topic_namespace: "camera"
+          topic_namespace: "/camera"
       resnet_demo:
         args:
           cache_gpu_type_key: orin
