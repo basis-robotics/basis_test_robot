@@ -1,0 +1,6 @@
+---
+groups:
+  foxglove:
+    process: True
+    units:
+      foxglove: {}
