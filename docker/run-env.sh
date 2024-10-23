@@ -3,7 +3,7 @@ PROJECT_ROOT=$SCRIPT_DIR/..
 
 BASIS_SOURCE_DIR=${BASIS_SOURCE_DIR:-"$PROJECT_ROOT/../basis"}
 
-if [ "$(docker ps -a -q -f name=basis)" ]; then
+if [ "$(docker ps -a -q -f name=^/basis$)" ]; then
     docker exec -it basis /bin/bash $@
 else
     # Note: this relies on macos specific user mapping magic to mount with the proper permissions

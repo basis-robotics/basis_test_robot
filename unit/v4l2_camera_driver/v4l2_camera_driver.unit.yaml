@@ -16,15 +16,10 @@ cpp_includes:
 handlers:
   OnCameraImage:
     sync:
+      # All inputs are required (of which there are technically none)
       type: all
-      # We can't quite hit 30 fps, probably due to poor coding of this unit
-      # Ideally it shouldn't matter and we occasionally drop a frame, but we need controls to not overload the callback buffer and have multiple rate subscriber callbacks in flight
-      # This still also really wants type:external as it blocks
+      # Run at 30fps
       rate: 0.03333333333
-      # Run cameras at 10 fps - the current model only runs so fast
-      # rate: 0.1
-      
-      
     outputs:
       "{{args.topic_namespace}}/yuyv":
         type: protobuf:foxglove.RawImage
