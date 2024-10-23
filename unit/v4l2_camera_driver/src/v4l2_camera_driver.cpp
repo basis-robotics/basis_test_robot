@@ -12,7 +12,6 @@
 
 #include <v4l2_camera_driver.h>
 
-
 // Adapted from
 // https://gist.github.com/sammy17/b391c68a91f381aad0d149e325e6a87e
 // TODO: translate these
@@ -54,7 +53,6 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
   imageFormat.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
   imageFormat.fmt.pix.field = V4L2_FIELD_NONE;
 
-
   struct v4l2_fmtdesc fmt;
   struct v4l2_frmsizeenum frmsize;
 
@@ -66,7 +64,7 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
   fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
     // Useful for later, but for now, skip any non YUYV
-    if(fmt.pixelformat == V4L2_PIX_FMT_YUYV) {
+    if (fmt.pixelformat == V4L2_PIX_FMT_YUYV) {
       frmsize.pixel_format = fmt.pixelformat;
       frmsize.index = 0;
       while (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0) {
@@ -75,9 +73,9 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
         if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
           width = frmsize.discrete.width;
           height = frmsize.discrete.height;
-          BASIS_LOG_DEBUG("{}x{}",width, height);
+          BASIS_LOG_DEBUG("{}x{}", width, height);
 
-          if(width > imageFormat.fmt.pix.width) {
+          if (width > imageFormat.fmt.pix.width) {
             imageFormat.fmt.pix.width = width;
             imageFormat.fmt.pix.height = height;
           }
@@ -87,13 +85,12 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
     }
     fmt.index++;
   }
-  
+
   // Enforce 640x480 as large messages aren't happy yet over TCP
-  //imageFormat.fmt.pix.width = 640;
-  //imageFormat.fmt.pix.height = 480;
+  // imageFormat.fmt.pix.width = 640;
+  // imageFormat.fmt.pix.height = 480;
   imageFormat.fmt.pix.width = 1280;
   imageFormat.fmt.pix.height = 720;
-
 
   if (imageFormat.fmt.pix.width == 0) {
     BASIS_LOG_ERROR("Unable to find a suitable camera format");
@@ -108,7 +105,7 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
     return false;
   }
   // Note: this can silently fail...why?
-  
+
   struct v4l2_streamparm streamparm;
   streamparm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
@@ -119,23 +116,25 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
   }
 
   struct v4l2_frmivalenum frmival;
-  memset(&frmival,0,sizeof(frmival));
+  memset(&frmival, 0, sizeof(frmival));
   frmival.pixel_format = V4L2_PIX_FMT_YUYV;
   frmival.width = imageFormat.fmt.pix.width;
   frmival.height = imageFormat.fmt.pix.height;
-  while (ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) == 0) 
-  {
-      if (frmival.type == V4L2_FRMIVAL_TYPE_DISCRETE) 
-          BASIS_LOG_INFO("{} fps", 1.0*frmival.discrete.denominator/frmival.discrete.numerator);
-      else
-          BASIS_LOG_INFO("[{},{}] fps", 1.0*frmival.stepwise.max.denominator/frmival.stepwise.max.numerator, 1.0*frmival.stepwise.min.denominator/frmival.stepwise.min.numerator);
-      frmival.index++;    
+  while (ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) == 0) {
+    if (frmival.type == V4L2_FRMIVAL_TYPE_DISCRETE)
+      BASIS_LOG_INFO("{} fps", 1.0 * frmival.discrete.denominator / frmival.discrete.numerator);
+    else
+      BASIS_LOG_INFO("[{},{}] fps", 1.0 * frmival.stepwise.max.denominator / frmival.stepwise.max.numerator,
+                     1.0 * frmival.stepwise.min.denominator / frmival.stepwise.min.numerator);
+    frmival.index++;
   }
 
-  BASIS_LOG_INFO("Current frame rate {}/{}", streamparm.parm.capture.timeperframe.numerator, streamparm.parm.capture.timeperframe.denominator);
+  BASIS_LOG_INFO("Current frame rate {}/{}", streamparm.parm.capture.timeperframe.numerator,
+                 streamparm.parm.capture.timeperframe.denominator);
   streamparm.parm.capture.timeperframe.numerator = 1;
   streamparm.parm.capture.timeperframe.denominator = 30;
-  BASIS_LOG_INFO("Setting frame rate to {}/{}...", streamparm.parm.capture.timeperframe.numerator, streamparm.parm.capture.timeperframe.denominator);
+  BASIS_LOG_INFO("Setting frame rate to {}/{}...", streamparm.parm.capture.timeperframe.numerator,
+                 streamparm.parm.capture.timeperframe.denominator);
   if (ioctl(fd, VIDIOC_S_PARM, &streamparm) < 0) {
     BASIS_LOG_ERROR("Failed to VIDIOC_S_PARM");
     close(fd);
@@ -150,35 +149,34 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
     return false;
   }
 
-  BASIS_LOG_INFO("Current frame rate {}/{}", streamparm.parm.capture.timeperframe.numerator, streamparm.parm.capture.timeperframe.denominator);
-  
+  BASIS_LOG_INFO("Current frame rate {}/{}", streamparm.parm.capture.timeperframe.numerator,
+                 streamparm.parm.capture.timeperframe.denominator);
+
   // 4. Request Buffers from the device
   v4l2_requestbuffers requestBuffer = {0};
-  requestBuffer.count = BUFFER_COUNT;                          
+  requestBuffer.count = BUFFER_COUNT;
   requestBuffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE; // request a buffer wich we an use for capturing frames
   requestBuffer.memory = V4L2_MEMORY_MMAP;
 
-BASIS_LOG_INFO("Request {} buffers", BUFFER_COUNT);
+  BASIS_LOG_INFO("Request {} buffers", BUFFER_COUNT);
   if (ioctl(fd, VIDIOC_REQBUFS, &requestBuffer) < 0) {
     BASIS_LOG_ERROR("Could not request buffer from device, VIDIOC_REQBUFS");
     close(fd);
     return false;
   }
-  for(int buffer_index = 0; buffer_index < BUFFER_COUNT; buffer_index++) {
+  for (int buffer_index = 0; buffer_index < BUFFER_COUNT; buffer_index++) {
     // 5. Query the buffer to get raw data ie. ask for the you requested buffer
     // and allocate memory for it
     v4l2_buffer queryBuffer = {0};
     queryBuffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     queryBuffer.memory = V4L2_MEMORY_MMAP;
     queryBuffer.index = buffer_index;
-            
 
     if (ioctl(fd, VIDIOC_QUERYBUF, &queryBuffer) < 0) {
       BASIS_LOG_ERROR("Device did not return the buffer information, VIDIOC_QUERYBUF");
       close(fd);
       return false;
     }
-        
 
     // use a pointer to point to the newly created buffer
     // mmap() will map the memory address of the device to
@@ -187,11 +185,9 @@ BASIS_LOG_INFO("Request {} buffers", BUFFER_COUNT);
         (char *)mmap(NULL, queryBuffer.length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, queryBuffer.m.offset);
     memset(camera_buffers[buffer_index], 0, queryBuffer.length);
 
-    BASIS_LOG_INFO("buffer len {}", queryBuffer.length);
-
     // 6. Get a frame
     // Create a new buffer type so the device knows whichbuffer we are talking about
-    auto* buffer_info = buffer_infos + buffer_index;
+    auto *buffer_info = buffer_infos + buffer_index;
     memset(buffer_info, 0, sizeof(v4l2_buffer));
     buffer_info->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     buffer_info->memory = V4L2_MEMORY_MMAP;
@@ -206,11 +202,9 @@ BASIS_LOG_INFO("Request {} buffers", BUFFER_COUNT);
 
   BASIS_LOG_INFO("Successfully opened camera at {}", camera_device);
 
-
-
   camera_fd = fd;
 
-  for(int i = 0; i < BUFFER_COUNT; i++) {
+  for (int i = 0; i < BUFFER_COUNT; i++) {
     if (!Queue(i)) {
       BASIS_LOG_ERROR("Could not queue buffer, VIDIOC_QBUF");
       CloseCamera();
@@ -221,17 +215,13 @@ BASIS_LOG_INFO("Request {} buffers", BUFFER_COUNT);
   return true;
 }
 
-bool v4l2_camera_driver::Queue(int index) {
-  return ioctl(camera_fd, VIDIOC_QBUF, buffer_infos + index) >= 0;
-}
-bool v4l2_camera_driver::Dequeue(int index) {
-  return ioctl(camera_fd, VIDIOC_DQBUF, buffer_infos + index) >= 0;
-}
+bool v4l2_camera_driver::Queue(int index) { return ioctl(camera_fd, VIDIOC_QBUF, buffer_infos + index) >= 0; }
+bool v4l2_camera_driver::Dequeue(int index) { return ioctl(camera_fd, VIDIOC_DQBUF, buffer_infos + index) >= 0; }
 
 // TODO: move this to another thread?
 OnCameraImage::Output v4l2_camera_driver::OnCameraImage(const OnCameraImage::Input &input) {
   OnCameraImage::Output output;
-  if (InitializeCamera("/dev/video0")) {
+  if (InitializeCamera(args.device)) {
     current_index++;
     current_index %= BUFFER_COUNT;
 
@@ -242,8 +232,9 @@ OnCameraImage::Output v4l2_camera_driver::OnCameraImage(const OnCameraImage::Inp
       return {};
     }
 
-    output.camera_yuyv_cuda = std::make_shared<image_conversion::CudaManagedImage>(image_conversion::PixelFormat::YUV422, (size_t)imageFormat.fmt.pix.width, (size_t)imageFormat.fmt.pix.height,  input.time, (std::byte*)camera_buffers[current_index]);
-    output.camera_yuyv = output.camera_yuyv_cuda->ToFoxglove();
+    output.args_topic_namespace_yuyv = std::make_shared<image_conversion::CudaManagedImage>(
+        image_conversion::PixelFormat::YUV422, (size_t)imageFormat.fmt.pix.width, (size_t)imageFormat.fmt.pix.height,
+        input.time, (std::byte *)camera_buffers[current_index]);
 
     // Note: it looks like sometimes we race between dequeueing and more data filling the buffer
 

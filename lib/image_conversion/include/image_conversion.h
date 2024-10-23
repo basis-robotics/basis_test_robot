@@ -4,6 +4,7 @@
 #include <string.h>
 #include <memory>
 #include <basis/core/time.h>
+#include <variant>
 
 #define CUDA_SAFE_CALL_NO_SYNC(call) do {                                \
     cudaError err = call;                                                    \
@@ -34,7 +35,7 @@ enum class PixelFormat {
 
 
 struct CudaManagedImage {
-    CudaManagedImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time, std::byte* data = nullptr);
+    CudaManagedImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time, const std::byte* data = nullptr);
     ~CudaManagedImage();
     CudaManagedImage(const CudaManagedImage&) = delete;
     CudaManagedImage& operator=(const CudaManagedImage&) = delete;
@@ -53,8 +54,12 @@ struct CudaManagedImage {
         return StepSize() * height;
     }
 
-    std::shared_ptr<foxglove::RawImage> ToFoxglove() const;
-
+    std::shared_ptr<foxglove::RawImage> ToMessage() const;
+    static std::shared_ptr<image_conversion::CudaManagedImage> FromMessage(const foxglove::RawImage* message);
+    static std::shared_ptr<const image_conversion::CudaManagedImage> FromVariant(
+        const std::variant<std::monostate,
+            std::shared_ptr<const foxglove::RawImage>,
+            std::shared_ptr<const image_conversion::CudaManagedImage>>& variant);
 
     const PixelFormat pixel_format;
     const int width;

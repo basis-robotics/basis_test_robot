@@ -1,11 +1,13 @@
-# TODO: don't do this, use the file name?
-# the default name of the unit
-# name: example
+args:
+  device:
+    type: string
+    help: The device to capture from
+    default: /dev/video0
+  topic_namespace:
+    type: string
+    default: /camera
 
-# The ways handlers are allowed to interact with eachother 
 threading_model:
-  # single - by default all handlers run mutually exclusive from eachother
-  # multi - by default all handlers run in parallel
   single
 cpp_includes:
   - foxglove/RawImage.pb.h
@@ -24,9 +26,6 @@ handlers:
       
       
     outputs:
-      /camera/yuyv:
+      "{{args.topic_namespace}}/yuyv":
         type: protobuf:foxglove.RawImage
-        optional: True
-      /camera/yuyv/cuda:
-        type: raw:image_conversion::CudaManagedImage
-        optional: False
+        inproc_type: image_conversion::CudaManagedImage

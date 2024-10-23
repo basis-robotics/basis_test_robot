@@ -1,6 +1,8 @@
+#include "basis/core/time.h"
 #include <foxglove/RawImage.pb.h>
 #include <image_conversion.h>
 #include <nppi_color_conversion.h>
+
 
 void CheckCudaError() {
   auto e = cudaGetLastError();
@@ -12,7 +14,7 @@ void CheckCudaError() {
 
 namespace image_conversion {
 CudaManagedImage::CudaManagedImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time,
-                                   std::byte *data)
+                                   const std::byte *data)
     : pixel_format(pixel_format), width(width), height(height), time(time) {
   const size_t size = ImageSize();
   // cudaMalloc3D??
@@ -36,9 +38,39 @@ std::unique_ptr<CudaManagedImage> YUYV_to_RGB(const CudaManagedImage &image_in) 
   }
   return std::move(rgb);
 }
+std::shared_ptr<image_conversion::CudaManagedImage> CudaManagedImage::FromMessage(const foxglove::RawImage *message) {
+  PixelFormat pixel_format;
+  if (message->encoding() == "yuyv") {
+    pixel_format = PixelFormat::YUV422;
+  } else if (message->encoding() == "rgb8") {
+    pixel_format = PixelFormat::RGB;
+  } else {
+    return nullptr;
+  }
+  auto out = std::make_shared<image_conversion::CudaManagedImage>(
+      pixel_format, message->width(), message->height(),
+      basis::core::MonotonicTime::FromSecondsNanoseconds(message->timestamp().seconds(), message->timestamp().nanos()),
+      (const std::byte *)message->data().data());
+  return out;
+}
+std::shared_ptr<const image_conversion::CudaManagedImage>
+CudaManagedImage::FromVariant(const std::variant<std::monostate, std::shared_ptr<const foxglove::RawImage>,
+                                                 std::shared_ptr<const image_conversion::CudaManagedImage>> &variant) {
+  switch (variant.index()) {
+  case /*basis::MessageVariant::NO_MESSAGE*/ 0:
+    return {};
+  case /*basis::MessageVariant::DESERIALIZED_MESSAGE*/ 1: {
+    auto foxglove = std::get</*basis::MessageVariant::DESERIALIZED_MESSAGE*/1>(variant);
+    return FromMessage(foxglove.get());
+  };
+  case /*basis::MessageVariant::INPROC_MESSAGE*/ 2:
+    return std::get</*basis::MessageVariant::INPROC_MESSAGE*/ 2>(variant);
+  }
 
-std::shared_ptr<foxglove::RawImage> CudaManagedImage::ToFoxglove() const {
+  return {};
+}
 
+std::shared_ptr<foxglove::RawImage> CudaManagedImage::ToMessage() const {
   auto image_msg = std::make_shared<foxglove::RawImage>();
 
   const timespec ts = time.ToTimespec();

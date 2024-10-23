@@ -4,14 +4,18 @@
 
 */
 
+#include "basis/core/logging/macros.h"
+#include "basis/core/transport/convertable_inproc.h"
+#include "image_conversion.h"
+#include <memory>
 #include <yuyv_to_rgb.h>
 
 using namespace unit::yuyv_to_rgb;
 
+OnYUYV::Output yuyv_to_rgb::OnYUYV(const OnYUYV::Input &input) {
+  std::shared_ptr<const image_conversion::CudaManagedImage> yuyv =
+      image_conversion::CudaManagedImage::FromVariant(input.args_topic_namespace_yuyv);
+  std::shared_ptr<image_conversion::CudaManagedImage> rgb = YUYV_to_RGB(*yuyv);
 
-OnYUYV::Output yuyv_to_rgb::OnYUYV(const OnYUYV::Input& input) {
-
-  auto rgb = YUYV_to_RGB(*input.camera_yuyv_cuda.get());
-  auto foxglove = rgb->ToFoxglove();
-  return {std::move(rgb), foxglove};
+  return {rgb};
 }
