@@ -185,25 +185,6 @@ std::vector<Detection> InferenceDetrResnet::Infer(const image_conversion::CudaMa
     return {};
   }
 
-// Attempt at using nppi to do the copy and scale
-// Doesn't work, the final step only copies one third of the image...
-#if 0
-  int scratch_step;
-  float *scratch = nppiMalloc_32f_C3(inference_width, inference_height, &scratch_step);
-  nppiConvert_8u32f_C3R((const unsigned char *)image.buffer, image.StepSize(), scratch, scratch_step,
-                        {inference_width, inference_height});
-
-  // mul in place??
-  nppiMulC_32f_C1IR(1.0 / 255.0, scratch, scratch_step, {inference_width, inference_height});
-
-  const int num_pixels = inference_width * inference_height;
-  float* planes[3] = {inference_buffer, inference_buffer + num_pixels,
-                     inference_buffer + num_pixels * 2};
-                     
-  nppiCopy_32f_C3P3R(scratch, inference_width * sizeof(float) * 3, planes, inference_width * sizeof(float), {inference_width, inference_height});
-
-  nppiFree(scratch);
-#endif
   RGBToTensor((const unsigned char *)image.buffer, image.width, image.height, image.StepSize(), inference_buffer,
               inference_width, inference_height);
 

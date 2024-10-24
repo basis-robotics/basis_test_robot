@@ -6,11 +6,11 @@
 
 */
 
-#include <resnet_demo.h>
+#include <perception_demo.h>
 
-using namespace unit::resnet_demo;
+using namespace unit::perception_demo;
 
 
-OnRGB::Output resnet_demo::OnRGB(const OnRGB::Input& input) {
+OnRGB::Output perception_demo::OnRGB(const OnRGB::Input& input) {
     static_assert(false, "Implement me");
 }
