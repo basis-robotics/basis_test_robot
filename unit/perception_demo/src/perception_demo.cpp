@@ -12,16 +12,16 @@
 #include <foxglove/RawImage.pb.h>
 #include <memory>
 #include <onnxruntime_c_api.h>
-#include <resnet_demo.h>
-using namespace unit::resnet_demo;
+#include <perception_demo.h>
+using namespace unit::perception_demo;
 
-resnet_demo::resnet_demo(const unit::resnet_demo::Args &args, const std::optional<std::string_view> &name_override)
-    : unit::resnet_demo::Base(args, name_override), args(args) {
+perception_demo::perception_demo(const unit::perception_demo::Args &args, const std::optional<std::string_view> &name_override)
+    : unit::perception_demo::Base(args, name_override), args(args) {
   inference = std::make_unique<InferenceYoloV9>(
       std::filesystem::path(args.model_directory) / args.model, args.cache_gpu_type_key,
       args.force_dump_cache ? InferenceRunMode::DUMP_CACHE : InferenceRunMode::INFERENCE);
 }
-OnRGB::Output resnet_demo::OnRGB(const OnRGB::Input &input) {
+OnRGB::Output perception_demo::OnRGB(const OnRGB::Input &input) {
   std::shared_ptr<const image_conversion::CudaManagedImage> image =
       image_conversion::CudaManagedImage::FromVariant(input.camera_rgb);
 

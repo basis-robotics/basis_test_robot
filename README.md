@@ -57,7 +57,7 @@ A unit to output images from a USB camera or similar. Pass in `--device <device_
 
 Converts YUYV to RGB using CUDA.
 
-### unit/resnet_demo
+### unit/perception_demo
 
 An ML demo, using YOLOv8 to run image detection. Technically also supports resnet, but has poor performance (we should likely remove it). Uses onnx for model format. There's a slightly arcane process to generate the cached model - if there is interest we can either document it or make it much less arcane. 
 
