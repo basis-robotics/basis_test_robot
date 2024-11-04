@@ -216,6 +216,11 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
 bool v4l2_camera_driver::Queue(int index) { return ioctl(camera_fd, VIDIOC_QBUF, buffer_infos + index) >= 0; }
 bool v4l2_camera_driver::Dequeue(int index) { return ioctl(camera_fd, VIDIOC_DQBUF, buffer_infos + index) >= 0; }
 
+#if BASIS_HAS_CUDA
+using ImageType = image_conversion::CudaManagedImage;
+#else
+using ImageType = image_conversion::CpuImage;
+#endif
 // TODO: move this to another thread?
 OnCameraImage::Output v4l2_camera_driver::OnCameraImage(const OnCameraImage::Input &input) {
   OnCameraImage::Output output;
@@ -230,7 +235,7 @@ OnCameraImage::Output v4l2_camera_driver::OnCameraImage(const OnCameraImage::Inp
       return {};
     }
 
-    output.args_topic_namespace_yuyv = std::make_shared<image_conversion::CudaManagedImage>(
+    output.args_topic_namespace_yuyv = std::make_shared<ImageType>(
         image_conversion::PixelFormat::YUV422, (size_t)imageFormat.fmt.pix.width, (size_t)imageFormat.fmt.pix.height,
         input.time, (std::byte *)camera_buffers[current_index]);
 
