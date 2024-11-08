@@ -1,0 +1,33 @@
+args:
+  device:
+    type: string
+    help: The device to capture from
+    optional: True
+  
+  width:
+    type: uint32_t
+    default: 1280
+  height:
+    type: uint32_t
+    default: 720
+  topic_namespace:
+    type: string
+    default: /camera
+
+threading_model:
+  single
+cpp_includes:
+  - foxglove/RawImage.pb.h
+  - image_conversion.h
+
+handlers:
+  OnCameraImage:
+    sync:
+      # All inputs are required (of which there are technically none)
+      type: all
+      # Run at 30fps
+      rate: 0.03333333333
+    outputs:
+      "{{args.topic_namespace}}/rgb":
+        type: protobuf:foxglove.RawImage
+        inproc_type: image_conversion::Image

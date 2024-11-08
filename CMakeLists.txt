@@ -28,6 +28,8 @@ add_subdirectory(lib/image_conversion)
 
 add_subdirectory(unit/v4l2_camera_driver)
 
+add_subdirectory(unit/rpi_libcamera_driver)
+
 if(CMAKE_CUDA_COMPILER)
     add_subdirectory(unit/perception_demo)
     add_subdirectory(unit/yuyv_to_rgb)

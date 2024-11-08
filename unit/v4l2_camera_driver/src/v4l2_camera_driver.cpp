@@ -73,7 +73,7 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
         if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
           width = frmsize.discrete.width;
           height = frmsize.discrete.height;
-          BASIS_LOG_DEBUG("{}x{}", width, height);
+          BASIS_LOG_ERROR("{}x{}", width, height);
 
           if (width > imageFormat.fmt.pix.width) {
             imageFormat.fmt.pix.width = width;
@@ -107,8 +107,8 @@ bool v4l2_camera_driver::InitializeCamera(std::string_view camera_device) {
   struct v4l2_streamparm streamparm;
   streamparm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-  if (ioctl(fd, VIDIOC_G_PARM, &streamparm) < 0) {
-    BASIS_LOG_ERROR("VIDIOC_G_PARM");
+  if (int result = ioctl(fd, VIDIOC_G_PARM, &streamparm) < 0) {
+    BASIS_LOG_ERROR("VIDIOC_G_PARM failed - {} {}", errno, result);
     close(fd);
     return false;
   }
