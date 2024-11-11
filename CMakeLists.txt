@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
 
+set(CMAKE_POLICY_DEFAULT_CMP0174 NEW)
+
 project(BasisTestRobot LANGUAGES CXX)
 include(CheckLanguage)
 check_language(CUDA)
@@ -20,8 +22,13 @@ function(multi_option variable docstring value)
   endif()
 endfunction()
 
-
 multi_option(BASIS_PLATFORM "Platform to compile on" "UNKNOWN" "ORIN" "PI")
+
+if((BASIS_PLATFORM STREQUAL "UNKNOWN") AND DEFINED ENV{BASIS_PLATFORM})
+  set(BASIS_PLATFORM $ENV{BASIS_PLATFORM})
+  message(STATUS "BASIS_PLATFORM not set, pulled BASIS_PLATFORM='${BASIS_PLATFORM}' from environment")
+endif()
+
 message(STATUS "BASIS_PLATFORM='${BASIS_PLATFORM}'")
 
 if(CMAKE_CUDA_COMPILER)
@@ -30,11 +37,6 @@ else()
     add_compile_definitions(BASIS_HAS_CUDA=0)
     message(WARNING "No CUDA support detected, disabling CUDA features")
 endif()
-
-# TODO?
-# https://github.com/descampsa/yuv2rgb
-
-#set(CMAKE_CUDA_ARCHITECTURES "native")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
