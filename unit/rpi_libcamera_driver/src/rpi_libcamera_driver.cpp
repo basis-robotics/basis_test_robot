@@ -120,6 +120,7 @@ error:
 }
 
 void rpi_libcamera_driver::OnRequestComplete(libcamera::Request* request) {
+  BASIS_LOG_INFO("rpi_libcamera_driver::OnRequestComplete");
   if (request->status() == libcamera::Request::RequestCancelled){
     return;
   }

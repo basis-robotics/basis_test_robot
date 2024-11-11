@@ -1,0 +1,43 @@
+args:
+  i2c_device:
+    type: string
+    default: "/dev/i2c-1"
+  address:
+    type: int32_t
+    default: 0x40
+  default_angle_0:
+    type: float
+    help: the angle to start at
+    default: 0
+  default_angle_1:
+    type: float
+    help: the angle to start at
+    default: 0
+threading_model:
+  single
+cpp_includes: 
+  - google/protobuf/wrappers.pb.h
+
+handlers:
+  Update:
+    sync:
+      type: all
+      # Run at 100fps
+      rate: 0.01
+    outputs:
+      "/servo/0/current_degrees":
+        type: protobuf:google::protobuf::DoubleValue
+      "/servo/1/current_degrees":
+        type: protobuf:google::protobuf::DoubleValue
+  RequestState0:
+    sync:
+      type: all
+    inputs:
+      "/servo/0/request_degrees":
+        type: protobuf:google::protobuf::DoubleValue
+  RequestState1:
+    sync:
+      type: all
+    inputs:
+      "/servo/1/request_degrees":
+        type: protobuf:google::protobuf::DoubleValue
