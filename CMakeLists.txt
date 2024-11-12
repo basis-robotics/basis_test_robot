@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.25.1)
 
 set(CMAKE_POLICY_DEFAULT_CMP0174 NEW)
 
@@ -22,9 +22,9 @@ function(multi_option variable docstring value)
   endif()
 endfunction()
 
-multi_option(BASIS_PLATFORM "Platform to compile on" "UNKNOWN" "ORIN" "PI")
+multi_option(BASIS_PLATFORM "Platform to compile on" "UNKNOWN" "ORIN" "PI" "OFF")
 
-if((BASIS_PLATFORM STREQUAL "UNKNOWN") AND DEFINED ENV{BASIS_PLATFORM})
+if((BASIS_PLATFORM STREQUAL "UNKNOWN" OR BASIS_PLATFORM STREQUAL "OFF") AND DEFINED ENV{BASIS_PLATFORM})
   set(BASIS_PLATFORM $ENV{BASIS_PLATFORM})
   message(STATUS "BASIS_PLATFORM not set, pulled BASIS_PLATFORM='${BASIS_PLATFORM}' from environment")
 endif()

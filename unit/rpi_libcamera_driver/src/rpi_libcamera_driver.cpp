@@ -32,6 +32,10 @@ OnCameraImage::Output rpi_libcamera_driver::OnCameraImage(const OnCameraImage::I
       active_camera->acquire();
       camera = active_camera;
     }
+    if(!camera) {
+      BASIS_LOG_WARN("No suitable camera found.");
+      return {};
+    }
     std::unique_ptr<libcamera::CameraConfiguration> config = camera->generateConfiguration( { libcamera::StreamRole::VideoRecording} );
 
     libcamera::StreamConfiguration &stream_config = config->at(0);
