@@ -188,7 +188,7 @@ std::vector<Detection> InferenceDetrResnet::Infer(const image_conversion::CudaMa
   RGBToTensor((const unsigned char *)image.buffer, image.width, image.height, image.StepSize(), inference_buffer,
               inference_width, inference_height);
 
-  CheckCudaError();
+  image_conversion::CheckCudaError();
 
   auto dets = Infer();
 
@@ -375,7 +375,7 @@ std::vector<Detection> InferenceYoloV9::Infer(const image_conversion::CudaManage
   RGBToTensor((const unsigned char *)resize_buffer, inference_width, inference_height, resize_step, inference_buffer,
               inference_width, inference_height);
 
-  CheckCudaError();
+  image_conversion::CheckCudaError();
 
   Ort::Value pixel_values_tensor = CreateInputInferenceTensor();
 

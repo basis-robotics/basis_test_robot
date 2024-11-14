@@ -10,7 +10,7 @@
 class v4l2_camera_driver : public unit::v4l2_camera_driver::Base {
 public:
   v4l2_camera_driver(const Args& args, const std::optional<std::string_view>& name_override = {}) 
-  : unit::v4l2_camera_driver::Base(args, name_override)
+  : unit::v4l2_camera_driver::Base(name_override)
   {}
 
 
