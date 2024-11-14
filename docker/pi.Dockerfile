@@ -9,6 +9,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
     --mount=target=/var/cache/apt,type=cache,sharing=locked \
     wget https://archive.raspberrypi.org/debian/raspberrypi.gpg.key -O - | sudo apt-key add - && \
     echo  "deb http://archive.raspberrypi.com/debian/ bookworm main" > /etc/apt/sources.list.d/raspi.list && \
+    apt update && \
     apt install -y --no-install-recommends \
         libcamera0.3 \
         libcamera-dev \
