@@ -42,3 +42,5 @@ ls /tmp/onnxruntime && \
     tar -zxvf /tmp/onnxruntime/onnxruntime-linux-aarch64-gpu-${ONNX_VERSION}.tgz -C /usr/ onnxruntime-linux-aarch64-gpu-${ONNX_VERSION}/include onnxruntime-linux-aarch64-gpu-${ONNX_VERSION}/lib  --strip-components=1
 
 USER basis
+
+ENV BASIS_PLATFORM=ORIN

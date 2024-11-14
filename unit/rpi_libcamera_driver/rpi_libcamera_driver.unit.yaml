@@ -2,7 +2,14 @@ args:
   device:
     type: string
     help: The device to capture from
-    default: /dev/video0
+    optional: True
+  
+  width:
+    type: uint32_t
+    default: 1280
+  height:
+    type: uint32_t
+    default: 720
   topic_namespace:
     type: string
     default: /camera
@@ -21,6 +28,6 @@ handlers:
       # Run at 30fps
       rate: 0.03333333333
     outputs:
-      "{{args.topic_namespace}}/yuyv":
+      "{{args.topic_namespace}}/rgb":
         type: protobuf:foxglove.RawImage
         inproc_type: image_conversion::Image

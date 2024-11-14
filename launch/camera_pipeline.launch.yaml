@@ -39,12 +39,12 @@ groups:
         args:
           device: {{args.device}}
           topic_namespace: {{args.camera_topic_namespace}}
-      yuyv_to_rgb:
-        args:
-          topic_namespace: {{args.camera_topic_namespace}}
-{% if args.enable_perception %}
-      perception_demo:
-        args:
-          cache_gpu_type_key: orin
-          log_timing: false
-{% endif %}
+#       yuyv_to_rgb:
+#         args:
+#           topic_namespace: {{args.camera_topic_namespace}}
+# {% if args.enable_perception %}
+#       perception_demo:
+#         args:
+#           cache_gpu_type_key: orin
+#           log_timing: false
+# {% endif %}

@@ -14,8 +14,8 @@ handlers:
     inputs:
       "{{args.topic_namespace}}/yuyv":
         type: protobuf:foxglove.RawImage
-        inproc_type: image_conversion::CudaManagedImage
+        inproc_type: image_conversion::Image
     outputs:
       "{{args.topic_namespace}}/rgb":
         type: protobuf:foxglove.RawImage
-        inproc_type: image_conversion::CudaManagedImage
+        inproc_type: image_conversion::Image
