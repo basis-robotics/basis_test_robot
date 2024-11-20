@@ -48,10 +48,21 @@ add_subdirectory(../basis/ basis)
 
 add_subdirectory(lib/image_conversion)
 
+add_subdirectory(proto)
+
+add_subdirectory(unit/joystick_driver)
 add_subdirectory(unit/v4l2_camera_driver)
 
 if(BASIS_PLATFORM STREQUAL "PI")
+  FetchContent_Declare(
+    PiPCA9685 
+    GIT_REPOSITORY https://github.com/basis-robotics/PiPCA9685.git
+    GIT_TAG main
+  )
+  FetchContent_MakeAvailable(PiPCA9685)
+
     add_subdirectory(unit/rpi_libcamera_driver)
+    add_subdirectory(unit/rpi_freenove_mecanum_driver)
     add_subdirectory(unit/rpi_freenove_servo_driver)
 endif()
 

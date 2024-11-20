@@ -1,0 +1,28 @@
+syntax= "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package basis.robot.state;
+
+message Vector2AndTheta {
+  float x = 1;
+  float y = 2;
+  float theta = 3;
+}
+
+enum MotorTypes {
+  FrontLeft = 0;
+  FrontRight = 1;
+  BackLeft = 2;
+  BackRight = 3;
+}
+
+message Motor {
+  float commanded_speed = 1;
+}
+
+message MotorState {
+  google.protobuf.Timestamp timestamp = 1;
+  Vector2AndTheta command = 2;
+  repeated Motor motors = 3;
+}

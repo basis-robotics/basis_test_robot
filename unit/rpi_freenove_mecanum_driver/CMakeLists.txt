@@ -1,0 +1,3 @@
+generate_unit(rpi_freenove_mecanum_driver)
+    
+target_link_libraries(unit_rpi_freenove_mecanum_driver PiPCA9685_cpp basis_robot_input_proto basis_robot_state_proto)

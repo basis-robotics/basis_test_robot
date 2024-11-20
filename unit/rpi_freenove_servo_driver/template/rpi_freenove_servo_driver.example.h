@@ -23,4 +23,7 @@ public:
   virtual unit::rpi_freenove_servo_driver::RequestState1::Output
   RequestState1(const unit::rpi_freenove_servo_driver::RequestState1::Input &input) override;
 
+  virtual unit::rpi_freenove_servo_driver::OnInputs::Output
+  OnInputs(const unit::rpi_freenove_servo_driver::OnInputs::Input &input) override;
+
 };

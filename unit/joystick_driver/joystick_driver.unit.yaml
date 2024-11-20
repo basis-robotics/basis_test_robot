@@ -1,0 +1,12 @@
+threading_model:
+  single
+cpp_includes:
+  - basis_robot_input.pb.h
+handlers:
+  Tick:
+    sync:
+      type: all
+      rate: 0.01
+    outputs:
+      /user_inputs:
+        type: protobuf:basis::robot::input::InputState

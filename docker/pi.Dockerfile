@@ -15,13 +15,16 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
         libcamera-dev \
         libcamera-ipa \
         libi2c-dev \
+        libevdev-dev \
         python3-jsonschema \
         python3-jinja2 \
         python-is-python3 \
-        python3-dev
-        
+        python3-dev \
+        pkg-config
 
-
+# Probably not right
+RUN groupadd -g 102 input && usermod -a -G input basis
+RUN groupadd -g 994 i2c && usermod -a -G i2c basis
 
 USER basis
 ENV BASIS_PLATFORM=PI

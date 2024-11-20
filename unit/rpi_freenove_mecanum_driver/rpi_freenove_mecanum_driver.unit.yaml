@@ -18,6 +18,7 @@ threading_model:
 cpp_includes: 
   - google/protobuf/wrappers.pb.h
   - basis_robot_input.pb.h
+  - basis_robot_state.pb.h
 
 handlers:
   Update:
@@ -26,22 +27,8 @@ handlers:
       # Run at 100fps
       rate: 0.01
     outputs:
-      "/servo/0/current_degrees":
-        type: protobuf:google::protobuf::DoubleValue
-      "/servo/1/current_degrees":
-        type: protobuf:google::protobuf::DoubleValue
-  RequestState0:
-    sync:
-      type: all
-    inputs:
-      "/servo/0/request_degrees":
-        type: protobuf:google::protobuf::DoubleValue
-  RequestState1:
-    sync:
-      type: all
-    inputs:
-      "/servo/1/request_degrees":
-        type: protobuf:google::protobuf::DoubleValue
+      /motor_state:
+        type: protobuf:basis::robot::state::MotorState
   OnInputs:
     sync:
       type: all

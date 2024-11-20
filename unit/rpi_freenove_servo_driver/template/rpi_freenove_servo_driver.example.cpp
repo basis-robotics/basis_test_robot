@@ -22,3 +22,7 @@ RequestState0::Output rpi_freenove_servo_driver::RequestState0(const RequestStat
 RequestState1::Output rpi_freenove_servo_driver::RequestState1(const RequestState1::Input& input) {
     static_assert(false, "Implement me");
 }
+
+OnInputs::Output rpi_freenove_servo_driver::OnInputs(const OnInputs::Input& input) {
+    static_assert(false, "Implement me");
+}
