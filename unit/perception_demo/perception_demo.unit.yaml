@@ -33,7 +33,7 @@ handlers:
     inputs:
       /camera/rgb:
         type: protobuf:foxglove.RawImage
-        inproc_type: image_conversion::CudaManagedImage
+        inproc_type: image_conversion::Image
         qos:
           depth: 1
     outputs:

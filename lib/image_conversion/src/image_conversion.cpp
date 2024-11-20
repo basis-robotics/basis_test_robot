@@ -28,9 +28,9 @@ std::shared_ptr<T_IMAGE_TYPE> ImageFromMessage(const foxglove::RawImage *message
 }
 
 template<typename T_IMAGE_TYPE>
-std::shared_ptr<const T_IMAGE_TYPE>
+std::shared_ptr<const Image>
 ImageFromVariant(const std::variant<std::monostate, std::shared_ptr<const foxglove::RawImage>,
-                                                 std::shared_ptr<const T_IMAGE_TYPE>> &variant) {
+                                                 std::shared_ptr<const Image>> &variant) {
   switch (variant.index()) {
   case basis::MessageVariant::NO_MESSAGE:
     return {};
@@ -101,27 +101,20 @@ std::shared_ptr<CpuImage> CpuImage::FromMessage(const foxglove::RawImage* messag
 
 std::shared_ptr<const CpuImage>
 CpuImage::FromVariant(const std::variant<std::monostate, std::shared_ptr<const foxglove::RawImage>,
-                                                 std::shared_ptr<const CpuImage>> &variant) {
-                                                  return ImageFromVariant<CpuImage>(variant);
+                                                 std::shared_ptr<const Image>> &variant) {
+  auto image = ImageFromVariant<CpuImage>(variant);
+  if(image->GetGPUBuffer()) {
+    // TODO: conversions
+    std::cout << "non CPU image passed to CudaManagedImage::FromVariant" << std::endl;
+    return nullptr;
+  }
+  else {
+    return std::dynamic_pointer_cast<const CpuImage>(image);
+  }
 }
 
 void CpuImage::CopyToCPUBuffer(std::byte* out) const {
   memcpy(out, buffer.get(), ImageSize());
-}
-/*
-std::unique_ptr<CpuImage> YUYV_to_RGB(const CpuImage &image_in) {
-  auto rgb = std::make_unique<CpuImage>(PixelFormat::RGB, image_in.width, image_in.height, image_in.time);
-
-  auto status = nppiYUV422ToRGB_8u_C2C3R((const Npp8u *)image_in.buffer, image_in.StepSize(), (Npp8u *)rgb->buffer,
-                                         rgb->StepSize(), {image_in.width, image_in.height});
-  // TODO: logger
-  if (status != 0) {
-    std::cout << "bad status " << status << std::endl;
-    return nullptr;
-  }
-  return std::move(rgb);
-}
-*/
 }
 
 #if BASIS_HAS_CUDA
@@ -134,12 +127,6 @@ void CheckCudaError() {
   }
 }
 
-namespace image_conversion {
-Image::Image(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time)
-    : pixel_format(pixel_format), width(width), height(height), time(time) {
-  
-}
-
 CudaManagedImage::CudaManagedImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time,
                                    const std::byte *cpu_data)
     : Image(pixel_format, width, height, time) {
@@ -147,21 +134,28 @@ CudaManagedImage::CudaManagedImage(PixelFormat pixel_format, int width, int heig
   // cudaMalloc3D??
   CUDA_SAFE_CALL_NO_SYNC(cudaMalloc(&buffer, size));
 
-  if (data) {
-    cudaMemcpy(buffer, data, size, cudaMemcpyHostToDevice);
+  if (cpu_data) {
+    CUDA_SAFE_CALL_NO_SYNC(cudaMemcpy(buffer, cpu_data, size, cudaMemcpyHostToDevice));
   }
 }
 
 CudaManagedImage::~CudaManagedImage() { CUDA_SAFE_CALL_NO_SYNC(cudaFree(buffer)); }
 
-void CudaManagedImage::CopyToCPUBuffer(std::byte* out) {
-  CUDA_SAFE_CALL_NO_SYNC(cudaMemcpy(data->data(), out, ImageSize(), cudaMemcpyDeviceToHost));
+void CudaManagedImage::CopyToCPUBuffer(std::byte* out) const {
+  CUDA_SAFE_CALL_NO_SYNC(cudaMemcpy(out, buffer, ImageSize(), cudaMemcpyDeviceToHost));
 }
 
-std::unique_ptr<CudaManagedImage> YUYV_to_RGB(const CudaManagedImage &image_in) {
+std::unique_ptr<CudaManagedImage> YUYV_to_RGB(const Image &image_in) {
+  std::byte* buffer = image_in.GetGPUBuffer();
+  if(buffer == nullptr) {
+    // TODO: conversions
+    std::cout << "non GPU image passed into YUYV_to_RGB" << std::endl;
+    return nullptr;
+  }
+
   auto rgb = std::make_unique<CudaManagedImage>(PixelFormat::RGB, image_in.width, image_in.height, image_in.time);
 
-  auto status = nppiYUV422ToRGB_8u_C2C3R((const Npp8u *)image_in.buffer, image_in.StepSize(), (Npp8u *)rgb->buffer,
+  auto status = nppiYUV422ToRGB_8u_C2C3R((const Npp8u *)buffer, image_in.StepSize(), (Npp8u *)rgb->buffer,
                                          rgb->StepSize(), {image_in.width, image_in.height});
   // TODO: logger
   if (status != 0) {
@@ -177,9 +171,20 @@ std::shared_ptr<CudaManagedImage> CudaManagedImage::FromMessage(const foxglove::
 
 std::shared_ptr<const CudaManagedImage>
 CudaManagedImage::FromVariant(const std::variant<std::monostate, std::shared_ptr<const foxglove::RawImage>,
-                                                 std::shared_ptr<const CudaManagedImage>> &variant) {
-                                                  return ImageFromVariant<CudaManagedImage>(variant);
+                                                 std::shared_ptr<const Image>> &variant) {
+  auto image = ImageFromVariant<CudaManagedImage>(variant);
+  if(!image) {
+    return nullptr;
+  }
+  if(image->GetGPUBuffer()) {
+    return std::dynamic_pointer_cast<const CudaManagedImage>(image);
+  }
+  else {
+    // TODO: conversions
+    std::cout << "non GPU image passed to CudaManagedImage::FromVariant" << std::endl;
+    return nullptr;
+  }
 }
 
-} // namespace image_conversion
 #endif
+} // namespace image_conversion

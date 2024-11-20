@@ -16,8 +16,6 @@
         raise(SIGTRAP); \
         exit(EXIT_FAILURE);                                                  \
     } } while (0)
-
-void CheckCudaError();
 #endif
 
 /*
@@ -30,6 +28,10 @@ namespace foxglove {
 }
 namespace image_conversion {
 
+#if BASIS_HAS_CUDA
+void CheckCudaError();
+#endif
+
 enum class PixelFormat {
     Invalid,
     YUV422,
@@ -39,8 +41,8 @@ enum class PixelFormat {
 struct Image {
     Image(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time);
     virtual ~Image() = default;
-    // ManagedImage(const ManagedImage&) = delete;
-    // ManagedImage& operator=(const ManagedImage&) = delete;
+    Image(const Image&) = delete;
+    Image& operator=(const Image&) = delete;
     size_t StepSize() const {
         switch (pixel_format) {
         case PixelFormat::YUV422:
@@ -57,13 +59,15 @@ struct Image {
     }
 
     std::shared_ptr<foxglove::RawImage> ToMessage() const;
-    // static std::shared_ptr<image_conversion::ManagedImage> FromMessage(const foxglove::RawImage* message);
-    // static std::shared_ptr<const image_conversion::ManagedImage> FromVariant(
-    //     const std::variant<std::monostate,
-    //         std::shared_ptr<const foxglove::RawImage>,
-    //         std::shared_ptr<const image_conversion::ManagedImage>>& variant);
+    // static std::shared_ptr<Image> FromMessage(const foxglove::RawImage* message);
+    static std::shared_ptr<const Image> FromVariant(
+        const std::variant<std::monostate,
+            std::shared_ptr<const foxglove::RawImage>,
+            std::shared_ptr<const Image>>& variant);
 
     virtual void CopyToCPUBuffer(std::byte* out) const = 0;
+
+    virtual std::byte* GetGPUBuffer() const { return nullptr; }
 
     const PixelFormat pixel_format;
     const int width;
@@ -81,7 +85,7 @@ struct CpuImage : public Image {
     static std::shared_ptr<const image_conversion::CpuImage> FromVariant(
         const std::variant<std::monostate,
             std::shared_ptr<const foxglove::RawImage>,
-            std::shared_ptr<const image_conversion::CpuImage>>& variant);
+            std::shared_ptr<const Image>>& variant);
 
     std::unique_ptr<std::byte[]> buffer;
 };
@@ -92,40 +96,23 @@ struct CudaManagedImage : public Image {
     ~CudaManagedImage();
     CudaManagedImage(const CudaManagedImage&) = delete;
     CudaManagedImage& operator=(const CudaManagedImage&) = delete;
-    size_t StepSize() const {
-        switch (pixel_format) {
-        case PixelFormat::YUV422:
-            return 2 * width;
-        case PixelFormat::RGB:
-            return 3 * width;
-        default:
-            return 0;
-        }
-    }
-
-    size_t ImageSize() const {
-        return StepSize() * height;
-    }
 
     virtual void CopyToCPUBuffer(std::byte* out) const override;
 
+    virtual std::byte* GetGPUBuffer() const override {
+        return buffer;
+    }
 
-
-    std::shared_ptr<foxglove::RawImage> ToMessage() const;
     static std::shared_ptr<image_conversion::CudaManagedImage> FromMessage(const foxglove::RawImage* message);
     static std::shared_ptr<const image_conversion::CudaManagedImage> FromVariant(
         const std::variant<std::monostate,
             std::shared_ptr<const foxglove::RawImage>,
-            std::shared_ptr<const image_conversion::CudaManagedImage>>& variant);
+            std::shared_ptr<const image_conversion::Image>>& variant);
 
-    const PixelFormat pixel_format;
-    const int width;
-    const int height;
-    basis::core::MonotonicTime time;
     std::byte* buffer = nullptr;
 };
 
-std::unique_ptr<CudaManagedImage> YUYV_to_RGB(const CudaManagedImage& image_in);
+std::unique_ptr<CudaManagedImage> YUYV_to_RGB(const Image& image_in);
 #endif
 
 
