@@ -23,3 +23,4 @@ groups:
           width: 640
           height: 480
       rpi_freenove_servo_driver: {}
+      rpi_freenove_mecanum_driver: {}

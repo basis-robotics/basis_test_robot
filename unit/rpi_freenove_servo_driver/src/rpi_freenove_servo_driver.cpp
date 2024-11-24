@@ -47,15 +47,14 @@ Update::Output rpi_freenove_servo_driver::Update(const Update::Input& input) {
     constexpr float MAX_JOYSTICK_DEGREES_SEC = 180.0f;
     // Get the update rate for this handler
     const auto duration = handlers["Update"]->rate_duration; 
-    constexpr int X_AXIS_IDX = 0;
 
     // TODO: move to config
-    constexpr size_t AXIS_IDXES[2] = {0, 1};
+    constexpr size_t AXIS_IDXES[2] = {2, 5};
 
     const auto& joystick = last_input->joysticks()[0];
     for(int i = 0; i < 2; i++) {
       const float delta = joystick.axes()[AXIS_IDXES[i]] * MAX_JOYSTICK_DEGREES_SEC * duration->ToSeconds();
-      requested_state[i] = std::clamp(requested_state[i] + delta, -70.0, 70.0);
+      requested_state[i] = std::clamp(requested_state[i] - delta, -70.0, 70.0);
     }
   }
   else {

@@ -10,10 +10,10 @@ message Vector2AndTheta {
   float theta = 3;
 }
 
-enum MotorTypes {
+enum MotorIndexes {
   FrontLeft = 0;
-  FrontRight = 1;
-  BackLeft = 2;
+  BackLeft = 1;
+  FrontRight = 2;
   BackRight = 3;
 }
 

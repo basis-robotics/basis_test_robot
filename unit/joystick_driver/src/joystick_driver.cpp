@@ -8,25 +8,10 @@ using namespace unit::joystick_driver;
 
 #include <google/protobuf/util/time_util.h>
 
-
 #include <libevdev/libevdev.h>
 
 
-
-#include <stdio.h>
-#include <math.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <sys/inotify.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <linux/joystick.h>
-#include <linux/input.h>
-
-
 Joystick::Joystick(const char* path) : path(path) {
-  
 	fd = open(path, O_RDWR | O_NONBLOCK);
   if (fd == -1)
   {
