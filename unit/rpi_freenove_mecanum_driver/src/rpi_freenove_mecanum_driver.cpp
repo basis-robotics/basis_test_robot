@@ -15,7 +15,7 @@ std::array<float, 4> XYTtoWheels(float x, float y, float theta) {
   // This isn't quite what we want, I think the /3.0 is bad
   return {
     -MAX_SPEED * (y+x-theta),
-    MAX_SPEED * (y-x-theta),
+    MAX_SPEED * (y-x-theta), // Note: the hardware for this device has one reversed motor
     -MAX_SPEED * (y+x+theta),
     -MAX_SPEED * (y-x+theta),
   };
