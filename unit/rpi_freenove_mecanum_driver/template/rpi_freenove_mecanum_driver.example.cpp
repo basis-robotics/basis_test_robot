@@ -14,7 +14,3 @@ using namespace unit::rpi_freenove_mecanum_driver;
 Update::Output rpi_freenove_mecanum_driver::Update(const Update::Input& input) {
     static_assert(false, "Implement me");
 }
-
-OnInputs::Output rpi_freenove_mecanum_driver::OnInputs(const OnInputs::Input& input) {
-    static_assert(false, "Implement me");
-}

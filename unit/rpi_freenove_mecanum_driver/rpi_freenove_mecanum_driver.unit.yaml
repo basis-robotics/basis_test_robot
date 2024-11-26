@@ -18,12 +18,13 @@ handlers:
       type: all
       # Run at 100fps
       rate: 0.01
-    outputs:
-      /motor_state:
-        type: protobuf:basis::robot::state::MotorState
-  OnInputs:
-    sync:
-      type: all
+    
     inputs:
       /user_inputs:
         type: protobuf:basis::robot::input::InputState
+        optional: True
+        cached: True
+
+    outputs:
+      /motor_state:
+        type: protobuf:basis::robot::state::MotorState

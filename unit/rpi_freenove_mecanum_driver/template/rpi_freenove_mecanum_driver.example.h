@@ -17,7 +17,4 @@ public:
   virtual unit::rpi_freenove_mecanum_driver::Update::Output
   Update(const unit::rpi_freenove_mecanum_driver::Update::Input &input) override;
 
-  virtual unit::rpi_freenove_mecanum_driver::OnInputs::Output
-  OnInputs(const unit::rpi_freenove_mecanum_driver::OnInputs::Input &input) override;
-
 };

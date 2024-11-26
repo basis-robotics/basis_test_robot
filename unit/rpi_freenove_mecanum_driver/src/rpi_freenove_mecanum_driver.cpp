@@ -36,8 +36,8 @@ Update::Output rpi_freenove_mecanum_driver::Update(const Update::Input& input) {
     motor_state->mutable_motors()->Add();
   }
 
-  if(last_input && last_input->joysticks().size()) {
-    auto& joystick = last_input->joysticks()[0];
+  if(input.user_inputs && input.user_inputs->joysticks().size()) {
+    auto& joystick = input.user_inputs->joysticks()[0];
     constexpr int X_AXIS_IDX = 0;
     constexpr int Y_AXIS_IDX = 1;
     constexpr int TURN_LEFT_IDX = 9;
@@ -76,10 +76,4 @@ Update::Output rpi_freenove_mecanum_driver::Update(const Update::Input& input) {
   return {
     std::move(motor_state)
   };
-}
-
-OnInputs::Output rpi_freenove_mecanum_driver::OnInputs(const OnInputs::Input& input) {
-  last_input = input.user_inputs;
-
-  return {};
 }

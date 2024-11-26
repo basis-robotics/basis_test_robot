@@ -10,6 +10,7 @@ using namespace unit::joystick_driver;
 
 #include <libevdev/libevdev.h>
 
+#include <sys/inotify.h>
 
 Joystick::Joystick(const char* path) : path(path) {
 	fd = open(path, O_RDWR | O_NONBLOCK);

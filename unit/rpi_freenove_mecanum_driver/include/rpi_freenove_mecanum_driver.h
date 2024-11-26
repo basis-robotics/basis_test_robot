@@ -13,10 +13,5 @@ public:
   virtual unit::rpi_freenove_mecanum_driver::Update::Output
   Update(const unit::rpi_freenove_mecanum_driver::Update::Input &input) override;
 
-  virtual unit::rpi_freenove_mecanum_driver::OnInputs::Output
-  OnInputs(const unit::rpi_freenove_mecanum_driver::OnInputs::Input &input) override;
-
-  std::shared_ptr<const basis::robot::input::InputState> last_input;
-
   PiPCA9685::PCA9685 pca;
 };
