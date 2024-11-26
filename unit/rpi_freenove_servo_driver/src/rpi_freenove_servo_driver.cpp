@@ -42,7 +42,14 @@ rpi_freenove_servo_driver::rpi_freenove_servo_driver(const Args& args, const std
 Update::Output rpi_freenove_servo_driver::Update(const Update::Input& input) {
   const float t = basis::core::MonotonicTime::Now().ToSeconds();
 
-  if(last_input && !last_input->joysticks().empty()) {
+  if(input.servo_0_request_degrees) {
+    requested_state[0] = input.servo_0_request_degrees->value();
+  }
+  if(input.servo_1_request_degrees) {
+    requested_state[1] = input.servo_1_request_degrees->value();
+  }
+
+  if(input.user_inputs && !input.user_inputs->joysticks().empty()) {
     // If we have a joystick connected, use it
     constexpr float MAX_JOYSTICK_DEGREES_SEC = 180.0f;
     // Get the update rate for this handler
@@ -51,7 +58,7 @@ Update::Output rpi_freenove_servo_driver::Update(const Update::Input& input) {
     // TODO: move to config
     constexpr size_t AXIS_IDXES[2] = {2, 5};
 
-    const auto& joystick = last_input->joysticks()[0];
+    const auto& joystick = input.user_inputs->joysticks()[0];
     for(int i = 0; i < 2; i++) {
       const float delta = joystick.axes()[AXIS_IDXES[i]] * MAX_JOYSTICK_DEGREES_SEC * duration->ToSeconds();
       requested_state[i] = std::clamp(requested_state[i] - delta, -70.0, 70.0);
@@ -59,6 +66,7 @@ Update::Output rpi_freenove_servo_driver::Update(const Update::Input& input) {
   }
   else {
     // Otherwise, rotate back and forth
+    // TODO: this logic will get moved out to a separate unit
     requested_state[0] = (sin(t * 2.0)) * 70.0;
     requested_state[1] = (sin(t * 3.1)) * 60.0;
   }
@@ -76,19 +84,4 @@ Update::Output rpi_freenove_servo_driver::Update(const Update::Input& input) {
 
   // Magic - convert from our array output to our output type
   return std::apply([](auto&&... args) { return Update::Output{args...}; }, std::tuple_cat(outputs));
-}
-
-RequestState0::Output rpi_freenove_servo_driver::RequestState0(const RequestState0::Input& input) {
-  requested_state[0] = input.servo_0_request_degrees->value();
-  return {};
-}
-
-RequestState1::Output rpi_freenove_servo_driver::RequestState1(const RequestState1::Input& input) {
-  requested_state[1] = input.servo_1_request_degrees->value();
-  return {};
-}
-
-OnInputs::Output rpi_freenove_servo_driver::OnInputs(const OnInputs::Input& input) {
-  last_input = input.user_inputs;
-  return {};
 }

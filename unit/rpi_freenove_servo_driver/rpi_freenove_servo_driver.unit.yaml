@@ -25,26 +25,20 @@ handlers:
       type: all
       # Run at 100fps
       rate: 0.01
+    inputs:
+      # All three inputs here are optional - we will run at 100hz regardless of the messages we get in
+      /user_inputs:
+        type: protobuf:basis::robot::input::InputState
+        optional: True
+        cached: True
+      /servo/1/request_degrees:
+        type: protobuf:google::protobuf::DoubleValue
+        optional: True
+      /servo/0/request_degrees:
+        type: protobuf:google::protobuf::DoubleValue
+        optional: True
     outputs:
       "/servo/0/current_degrees":
         type: protobuf:google::protobuf::DoubleValue
       "/servo/1/current_degrees":
         type: protobuf:google::protobuf::DoubleValue
-  RequestState0:
-    sync:
-      type: all
-    inputs:
-      "/servo/0/request_degrees":
-        type: protobuf:google::protobuf::DoubleValue
-  RequestState1:
-    sync:
-      type: all
-    inputs:
-      "/servo/1/request_degrees":
-        type: protobuf:google::protobuf::DoubleValue
-  OnInputs:
-    sync:
-      type: all
-    inputs:
-      /user_inputs:
-        type: protobuf:basis::robot::input::InputState

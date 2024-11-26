@@ -14,15 +14,3 @@ using namespace unit::rpi_freenove_servo_driver;
 Update::Output rpi_freenove_servo_driver::Update(const Update::Input& input) {
     static_assert(false, "Implement me");
 }
-
-RequestState0::Output rpi_freenove_servo_driver::RequestState0(const RequestState0::Input& input) {
-    static_assert(false, "Implement me");
-}
-
-RequestState1::Output rpi_freenove_servo_driver::RequestState1(const RequestState1::Input& input) {
-    static_assert(false, "Implement me");
-}
-
-OnInputs::Output rpi_freenove_servo_driver::OnInputs(const OnInputs::Input& input) {
-    static_assert(false, "Implement me");
-}
