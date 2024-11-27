@@ -36,7 +36,6 @@ rpi_freenove_servo_driver::rpi_freenove_servo_driver(const Args& args, const std
   : unit::rpi_freenove_servo_driver::Base(args, name_override), pca(args.i2c_device, args.address), current_state {args.default_angle_0, args.default_angle_1}, requested_state {args.default_angle_0, args.default_angle_1}
 {
   pca.set_pwm_freq(50.0);
- 
 }
 
 Update::Output rpi_freenove_servo_driver::Update(const Update::Input& input) {
@@ -59,7 +58,7 @@ Update::Output rpi_freenove_servo_driver::Update(const Update::Input& input) {
     constexpr size_t AXIS_IDXES[2] = {2, 5};
 
     const auto& joystick = input.user_inputs->joysticks()[0];
-    for(int i = 0; i < 2; i++) {
+    for(int i = 0; i < NUM_SERVOS; i++) {
       const float delta = joystick.axes()[AXIS_IDXES[i]] * MAX_JOYSTICK_DEGREES_SEC * duration->ToSeconds();
       requested_state[i] = std::clamp(requested_state[i] - delta, -70.0, 70.0);
     }
