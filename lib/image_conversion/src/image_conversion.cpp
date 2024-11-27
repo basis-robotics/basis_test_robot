@@ -8,6 +8,8 @@
 #include <nppi_color_conversion.h>
 #endif
 
+#include <google/protobuf/util/time_util.h>
+
 namespace image_conversion {
 
 template<typename T_IMAGE_TYPE>
@@ -54,10 +56,7 @@ Image::Image(PixelFormat pixel_format, int width, int height, basis::core::Monot
 std::shared_ptr<foxglove::RawImage> Image::ToMessage() const {
   auto image_msg = std::make_shared<foxglove::RawImage>();
 
-  const timespec ts = time.ToTimespec();
-
-  image_msg->mutable_timestamp()->set_seconds(ts.tv_sec);
-  image_msg->mutable_timestamp()->set_nanos(ts.tv_nsec);
+  *image_msg->mutable_timestamp() = google::protobuf::util::TimeUtil::NanosecondsToTimestamp(time.nsecs);
   image_msg->set_frame_id("webcam");
   switch (pixel_format) {
   case PixelFormat::YUV422:

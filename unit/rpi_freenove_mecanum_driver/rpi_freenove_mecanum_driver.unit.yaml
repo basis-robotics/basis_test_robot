@@ -1,0 +1,30 @@
+args:
+  i2c_device:
+    type: string
+    default: "/dev/i2c-1"
+  address:
+    type: int32_t
+    default: 0x40
+threading_model:
+  single
+cpp_includes: 
+  - google/protobuf/wrappers.pb.h
+  - basis_robot_input.pb.h
+  - basis_robot_state.pb.h
+
+handlers:
+  Update:
+    sync:
+      type: all
+      # Run at 100fps
+      rate: 0.01
+    
+    inputs:
+      /user_inputs:
+        type: protobuf:basis::robot::input::InputState
+        optional: True
+        cached: True
+
+    outputs:
+      /motor_state:
+        type: protobuf:basis::robot::state::MotorState

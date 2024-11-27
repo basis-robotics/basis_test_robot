@@ -36,6 +36,7 @@ OnCameraImage::Output rpi_libcamera_driver::OnCameraImage(const OnCameraImage::I
       BASIS_LOG_WARN("No suitable camera found.");
       return {};
     }
+    
     std::unique_ptr<libcamera::CameraConfiguration> config = camera->generateConfiguration( { libcamera::StreamRole::VideoRecording} );
 
     libcamera::StreamConfiguration &stream_config = config->at(0);
@@ -124,7 +125,6 @@ error:
 }
 
 void rpi_libcamera_driver::OnRequestComplete(libcamera::Request* request) {
-  BASIS_LOG_INFO("rpi_libcamera_driver::OnRequestComplete");
   if (request->status() == libcamera::Request::RequestCancelled){
     return;
   }

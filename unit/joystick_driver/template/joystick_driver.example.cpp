@@ -6,11 +6,11 @@
 
 */
 
-#include <rpi_freenove_servo_driver.h>
+#include <joystick_driver.h>
 
-using namespace unit::rpi_freenove_servo_driver;
+using namespace unit::joystick_driver;
 
 
-Update::Output rpi_freenove_servo_driver::Update(const Update::Input& input) {
+Tick::Output joystick_driver::Tick(const Tick::Input& input) {
     static_assert(false, "Implement me");
 }

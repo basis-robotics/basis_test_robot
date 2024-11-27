@@ -5,16 +5,22 @@ args:
     help: an additional logging regex to record
     optional: True
 ---
-
+# recording:
+#   directory: /tmp/
+#   name: crash_mcap
+#   topics:
+#     - '.*'
 
 groups:
   foxglove:
-    include:
-      foxglove.launch.yaml: {}
+    units:
+      foxglove: {}
   freenove:
     units:
+      joystick_driver: {}
       rpi_libcamera_driver:
         args: 
           width: 640
           height: 480
       rpi_freenove_servo_driver: {}
+      rpi_freenove_mecanum_driver: {}
