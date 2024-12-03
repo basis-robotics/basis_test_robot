@@ -23,7 +23,7 @@ std::shared_ptr<T_IMAGE_TYPE> ImageFromMessage(const foxglove::RawImage *message
   auto out = std::make_shared<T_IMAGE_TYPE>(
       pixel_format, message->width(), message->height(),
       basis::core::MonotonicTime::FromSecondsNanoseconds(message->timestamp().seconds(), message->timestamp().nanos()),
-      (const std::byte *)message->data().data());
+      message->frame_id(), (const std::byte *)message->data().data());
   return out;
 }
 
@@ -46,8 +46,8 @@ ImageFromVariant(const std::variant<std::monostate, std::shared_ptr<const foxglo
 }
 
 
-Image::Image(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time)
-    : pixel_format(pixel_format), width(width), height(height), time(time) {
+Image::Image(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time, std::string_view frame_id)
+    : pixel_format(pixel_format), width(width), height(height), time(time), frame_id(frame_id) {
   
 }
 
@@ -58,7 +58,7 @@ std::shared_ptr<foxglove::RawImage> Image::ToMessage() const {
 
   image_msg->mutable_timestamp()->set_seconds(ts.tv_sec);
   image_msg->mutable_timestamp()->set_nanos(ts.tv_nsec);
-  image_msg->set_frame_id("webcam");
+  image_msg->set_frame_id(frame_id);
   switch (pixel_format) {
   case PixelFormat::YUV422:
     image_msg->set_encoding("yuyv");
@@ -82,9 +82,9 @@ std::shared_ptr<foxglove::RawImage> Image::ToMessage() const {
   return image_msg;
 }
 
-CpuImage::CpuImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time,
+CpuImage::CpuImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time, std::string_view frame_id,
                                    const std::byte *cpu_data)
-    : Image(pixel_format, width, height, time) {
+    : Image(pixel_format, width, height, time, frame_id) {
   const size_t size = ImageSize();
   // cudaMalloc3D??
   //CUDA_SAFE_CALL_NO_SYNC(cudaMalloc(&buffer, size));
@@ -127,9 +127,9 @@ void CheckCudaError() {
   }
 }
 
-CudaManagedImage::CudaManagedImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time,
+CudaManagedImage::CudaManagedImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time, std::string_view frame_id,
                                    const std::byte *cpu_data)
-    : Image(pixel_format, width, height, time) {
+    : Image(pixel_format, width, height, time, frame_id) {
   const size_t size = ImageSize();
   // cudaMalloc3D??
   CUDA_SAFE_CALL_NO_SYNC(cudaMalloc(&buffer, size));
@@ -153,7 +153,7 @@ std::unique_ptr<CudaManagedImage> YUYV_to_RGB(const Image &image_in) {
     return nullptr;
   }
 
-  auto rgb = std::make_unique<CudaManagedImage>(PixelFormat::RGB, image_in.width, image_in.height, image_in.time);
+  auto rgb = std::make_unique<CudaManagedImage>(PixelFormat::RGB, image_in.width, image_in.height, image_in.time, image_in.frame_id);
 
   auto status = nppiYUV422ToRGB_8u_C2C3R((const Npp8u *)buffer, image_in.StepSize(), (Npp8u *)rgb->buffer,
                                          rgb->StepSize(), {image_in.width, image_in.height});

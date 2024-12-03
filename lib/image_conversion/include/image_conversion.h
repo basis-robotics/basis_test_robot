@@ -39,7 +39,7 @@ enum class PixelFormat {
 };
 
 struct Image {
-    Image(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time);
+    Image(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time, std::string_view frame_id);
     virtual ~Image() = default;
     Image(const Image&) = delete;
     Image& operator=(const Image&) = delete;
@@ -73,11 +73,11 @@ struct Image {
     const int width;
     const int height;
     basis::core::MonotonicTime time;
-    // std::byte* buffer = nullptr;
+    std::string frame_id;
 };
 
 struct CpuImage : public Image {
-    CpuImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time, const std::byte* data = nullptr);
+    CpuImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time, std::string_view frame_id, const std::byte* data = nullptr);
 
     virtual void CopyToCPUBuffer(std::byte* out) const override;
 
@@ -92,7 +92,7 @@ struct CpuImage : public Image {
 
 #if BASIS_HAS_CUDA
 struct CudaManagedImage : public Image {
-    CudaManagedImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time, const std::byte* data = nullptr);
+    CudaManagedImage(PixelFormat pixel_format, int width, int height, basis::core::MonotonicTime time, std::string_view frame_id, const std::byte* data = nullptr);
     ~CudaManagedImage();
     CudaManagedImage(const CudaManagedImage&) = delete;
     CudaManagedImage& operator=(const CudaManagedImage&) = delete;
