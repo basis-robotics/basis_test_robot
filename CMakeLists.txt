@@ -47,23 +47,28 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Add basis, use current binary directory as root, to avoid pollution
 add_subdirectory(../basis/ basis)
 
-FetchContent_Declare(
-    geometry2
-    SOURCE_DIR ../geometry2
-    GIT_REPOSITORY https://github.com/basis-robotics/geometry2.git
-    GIT_TAG basis
-)
-FetchContent_MakeAvailable(geometry2)
+if(EXISTS "../geometry2")
+  add_subdirectory(../geometry2/tf2_basis geometry2)
+else()
+  FetchContent_Declare(
+      geometry2
+      GIT_REPOSITORY https://github.com/basis-robotics/geometry2.git
+      GIT_TAG basis
+      SOURCE_DIR tf2_basis
+  )
+  FetchContent_MakeAvailable(geometry2)
+endif()
 
 add_subdirectory(lib/image_conversion)
 
 add_subdirectory(unit/v4l2_camera_driver)
 
+add_subdirectory(unit/static_transform_publisher)
+
 if(BASIS_PLATFORM STREQUAL "PI")
     add_subdirectory(unit/rpi_libcamera_driver)
     add_subdirectory(unit/rpi_freenove_servo_driver)
 endif()
-
 
 if(CMAKE_CUDA_COMPILER)
     add_subdirectory(unit/perception_demo)
