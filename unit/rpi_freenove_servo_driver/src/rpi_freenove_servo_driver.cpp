@@ -5,6 +5,8 @@
 */
 
 #include <rpi_freenove_servo_driver.h>
+#include <google/protobuf/util/time_util.h>
+#include <tf2_basis/tf2_basis.h>
 
 using namespace unit::rpi_freenove_servo_driver;
 
@@ -36,21 +38,11 @@ rpi_freenove_servo_driver::rpi_freenove_servo_driver(const Args& args, const std
   : unit::rpi_freenove_servo_driver::Base(args, name_override), pca(args.i2c_device, args.address), current_state {args.default_angle_0, args.default_angle_1}, requested_state {args.default_angle_0, args.default_angle_1}
 {
   pca.set_pwm_freq(50.0);
-  
-  // while(true) {
-  //   pca.set_pwm(0, 0, 370);
-  //   usleep(1'000'000);
-  //   pca.set_pwm(0, 0, 415);
-  //   usleep(1'000'000);
-  //   pca.set_pwm(0, 0, 460);
-  //   usleep(1'000'000);
-  //   pca.set_pwm(0, 0, 415);
-  //   usleep(1'000'000);
-  // }
 }
 
 Update::Output rpi_freenove_servo_driver::Update(const Update::Input& input) {
-  const float t = basis::core::MonotonicTime::Now().ToSeconds();
+  const auto now =  basis::core::MonotonicTime::Now();
+  const float t = now.ToSeconds();
   //BASIS_LOG_INFO("Requested angle: {}", R2D(sin(t / 20.0))) * (70.0 / 90.0);
 
   requested_state[0] = (sin(t * 2.0)) * 70.0;
@@ -68,9 +60,34 @@ Update::Output rpi_freenove_servo_driver::Update(const Update::Input& input) {
     pca.set_pwm_ms(8 + i, ms);
   }
 
+  auto transforms = std::make_shared<foxglove::FrameTransforms>();
+  {
+    auto servo_yaw_to_servo_pitch = transforms->add_transforms();
+    {
+      *servo_yaw_to_servo_pitch->mutable_timestamp() = google::protobuf::util::TimeUtil::NanosecondsToTimestamp(now.nsecs);
+      servo_yaw_to_servo_pitch->set_parent_frame_id("servo_yaw");
+      servo_yaw_to_servo_pitch->set_child_frame_id("servo_pitch");
+      servo_yaw_to_servo_pitch->mutable_translation()->set_z(0.04);
+      // No changes to the pitch for now, we've broken the servo
+    }
+
+    auto robot_to_servo_yaw = transforms->add_transforms();
+    {
+      *robot_to_servo_yaw->mutable_timestamp() = google::protobuf::util::TimeUtil::NanosecondsToTimestamp(now.nsecs);
+      robot_to_servo_yaw->set_parent_frame_id("robot");
+      robot_to_servo_yaw->set_child_frame_id("servo_yaw");
+      robot_to_servo_yaw->mutable_translation()->set_y(0.095);
+      tf2::Quaternion rotation;
+      rotation.setRPY(0, 0, D2R(current_state[0]));
+      robot_to_servo_yaw->mutable_rotation()->set_x(rotation.getX());
+      robot_to_servo_yaw->mutable_rotation()->set_y(rotation.getY());
+      robot_to_servo_yaw->mutable_rotation()->set_z(rotation.getZ());
+      robot_to_servo_yaw->mutable_rotation()->set_w(rotation.getW());
+    }
+  }
 
   // Magic - convert from our array output to our output type
-  return std::apply([](auto&&... args) { return Update::Output{args...}; }, std::tuple_cat(outputs));
+  return std::apply([&](auto&&... args) { return Update::Output{args..., transforms}; }, std::tuple_cat(outputs));
 }
 
 RequestState0::Output rpi_freenove_servo_driver::RequestState0(const RequestState0::Input& input) {

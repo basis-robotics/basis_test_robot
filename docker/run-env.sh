@@ -18,5 +18,6 @@ else
         -v $PROJECT_ROOT/../deterministic_replay:/deterministic_replay \
         --privileged \
         $ADDITIONAL_ARGS \
+        --net=host \
         --name basis --rm -it basis-robot-env /bin/bash $@
 fi

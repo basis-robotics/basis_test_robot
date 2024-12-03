@@ -1,12 +1,3 @@
----
-args: 
-  additional_log_topic:
-    type: string
-    help: an additional logging regex to record
-    optional: True
----
-
-
 groups:
   foxglove:
     include:
@@ -18,3 +9,4 @@ groups:
           width: 640
           height: 480
       rpi_freenove_servo_driver: {}
+      static_transform_publisher: {}

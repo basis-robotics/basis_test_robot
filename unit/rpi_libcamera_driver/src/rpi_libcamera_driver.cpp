@@ -124,7 +124,7 @@ error:
 }
 
 void rpi_libcamera_driver::OnRequestComplete(libcamera::Request* request) {
-  BASIS_LOG_INFO("rpi_libcamera_driver::OnRequestComplete");
+  BASIS_LOG_DEBUG("rpi_libcamera_driver::OnRequestComplete");
   if (request->status() == libcamera::Request::RequestCancelled){
     return;
   }

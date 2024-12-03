@@ -17,6 +17,7 @@ threading_model:
   single
 cpp_includes: 
   - google/protobuf/wrappers.pb.h
+  - foxglove/FrameTransforms.pb.h
 
 handlers:
   Update:
@@ -29,6 +30,8 @@ handlers:
         type: protobuf:google::protobuf::DoubleValue
       "/servo/1/current_degrees":
         type: protobuf:google::protobuf::DoubleValue
+      /tf2:
+        type: protobuf:foxglove.FrameTransforms
   RequestState0:
     sync:
       type: all
