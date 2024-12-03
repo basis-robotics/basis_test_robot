@@ -237,7 +237,7 @@ OnCameraImage::Output v4l2_camera_driver::OnCameraImage(const OnCameraImage::Inp
 
     output.args_topic_namespace_yuyv = std::make_shared<ImageType>(
         image_conversion::PixelFormat::YUV422, (size_t)imageFormat.fmt.pix.width, (size_t)imageFormat.fmt.pix.height,
-        input.time, (std::byte *)camera_buffers[current_index]);
+        input.time, args.topic_namespace.c_str() + 1, (std::byte *)camera_buffers[current_index]);
 
     // Note: it looks like sometimes we race between dequeueing and more data filling the buffer
 
