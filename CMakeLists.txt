@@ -47,6 +47,14 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Add basis, use current binary directory as root, to avoid pollution
 add_subdirectory(../basis/ basis)
 
+FetchContent_Declare(
+    geometry2
+    SOURCE_DIR ../geometry2
+    GIT_REPOSITORY https://github.com/basis-robotics/geometry2.git
+    GIT_TAG basis
+)
+FetchContent_MakeAvailable(geometry2)
+
 add_subdirectory(lib/image_conversion)
 
 add_subdirectory(unit/v4l2_camera_driver)
