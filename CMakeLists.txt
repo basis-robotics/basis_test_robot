@@ -54,7 +54,7 @@ else()
       geometry2
       GIT_REPOSITORY https://github.com/basis-robotics/geometry2.git
       GIT_TAG basis
-      SOURCE_DIR tf2_basis
+      SOURCE_SUBDIR tf2_basis
   )
   FetchContent_MakeAvailable(geometry2)
 endif()
