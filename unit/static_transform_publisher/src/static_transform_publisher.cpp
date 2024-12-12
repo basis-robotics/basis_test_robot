@@ -15,6 +15,14 @@ using namespace unit::static_transform_publisher;
 
 static inline constexpr std::string_view PLATFORM = XSTRINGIFY(BASIS_PLATFORM);
 
+// tf2::Transform stores rotation as a Matrix3x3 which causes extra conversions
+struct Transform {
+  tf2::Vector3 origin;
+  tf2::Quaternion rotation;
+  std::string parent_frame_id;
+  std::string child_frame_id;
+};
+
 Publish::Output static_transform_publisher::Publish(const Publish::Input& input) {
   auto transforms = std::make_shared<foxglove::FrameTransforms>();
   // TODO: maybe we should pass this as an arg instead
@@ -35,15 +43,15 @@ Publish::Output static_transform_publisher::Publish(const Publish::Input& input)
   else if constexpr(PLATFORM == "PI")
   {
     auto stamp = google::protobuf::util::TimeUtil::NanosecondsToTimestamp(basis::core::MonotonicTime::Now().nsecs);
-    const std::vector<std::pair<tf2::Stamped<tf2::Transform>, std::string>> static_transforms = {
+    const std::vector static_transforms = {
       // This is dynamic
-      //{{tf2::Transform{{0, 0, 0, 1.0}, {0.0, 0.095, 0.0}}, {}, "robot"}, "servo_yaw"},
-      //{{tf2::Transform{{0, 0, 0, 1.0}, {0.0, 0.0, 0.04}}, {}, "servo_yaw"}, "servo_pitch"},
-      {{tf2::Transform{{0, 0, 0, 1.0}, {0.0, 0.01, 0.023}}, {}, "servo_pitch"}, "camera"},
+      //{{0.0, 0.095, 0.0}, {0, 0, 0, 1.0}, , "robot", "servo_yaw"},
+      //{{0.0, 0.0, 0.04}, {0, 0, 0, 1.0}, , "servo_yaw", "servo_pitch"},
+      tf2_basis::toFoxglove({0.0, 0.01, 0.023}, {0, 0, 0, 1.0}, {}, "servo_pitch", "camera"),
     };
-    for(const auto& [t, frame] : static_transforms) {
+    for(const auto& t : static_transforms) {
       auto transform_msg = transforms->add_transforms();
-      *transform_msg = tf2_basis::toFoxglove(t, frame);
+      transform_msg->CopyFrom(t);
       *transform_msg->mutable_timestamp() = stamp;
     }
 
