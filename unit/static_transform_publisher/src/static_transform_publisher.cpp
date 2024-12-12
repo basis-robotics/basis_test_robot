@@ -15,14 +15,6 @@ using namespace unit::static_transform_publisher;
 
 static inline constexpr std::string_view PLATFORM = XSTRINGIFY(BASIS_PLATFORM);
 
-// tf2::Transform stores rotation as a Matrix3x3 which causes extra conversions
-struct Transform {
-  tf2::Vector3 origin;
-  tf2::Quaternion rotation;
-  std::string parent_frame_id;
-  std::string child_frame_id;
-};
-
 Publish::Output static_transform_publisher::Publish(const Publish::Input& input) {
   auto transforms = std::make_shared<foxglove::FrameTransforms>();
   // TODO: maybe we should pass this as an arg instead
