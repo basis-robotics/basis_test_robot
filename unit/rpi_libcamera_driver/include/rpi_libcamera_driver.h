@@ -13,6 +13,14 @@
 class rpi_libcamera_driver : public unit::rpi_libcamera_driver::Base {
 public:
   rpi_libcamera_driver(const Args& args, const std::optional<std::string_view>& name_override = {});
+  ~rpi_libcamera_driver() {
+    if(camera) {
+      camera->stop();
+      camera->release();
+    }
+    camera = nullptr;
+    camera_manager->stop();
+  }
 
   virtual unit::rpi_libcamera_driver::OnCameraImage::Output
   OnCameraImage(const unit::rpi_libcamera_driver::OnCameraImage::Input &input) override;

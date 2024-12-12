@@ -1,0 +1,17 @@
+syntax= "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package basis.robot.input;
+
+message Joystick {
+    string name = 1;
+    string path = 2;
+    uint32 buttons = 3;
+    repeated float axes = 4;
+}
+
+message InputState {
+    google.protobuf.Timestamp timestamp = 1;
+    repeated Joystick joysticks = 2;
+}

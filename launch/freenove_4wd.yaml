@@ -1,12 +1,14 @@
 groups:
   foxglove:
-    include:
-      foxglove.launch.yaml: {}
+    units:
+      foxglove: {}
   freenove:
     units:
+      joystick_driver: {}
       rpi_libcamera_driver:
         args: 
           width: 640
           height: 480
       rpi_freenove_servo_driver: {}
       static_transform_publisher: {}
+      rpi_freenove_mecanum_driver: {}
