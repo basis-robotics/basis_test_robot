@@ -10,7 +10,7 @@
 class perception_demo : public unit::perception_demo::Base {
 public:
   perception_demo(const Args& args, const std::optional<std::string_view>& name_override = {}) 
-  : unit::perception_demo::Base(name_override)
+  : unit::perception_demo::Base(args, name_override)
   {}
 
 

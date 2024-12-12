@@ -10,7 +10,7 @@
 class yuyv_to_rgb : public unit::yuyv_to_rgb::Base {
 public:
   yuyv_to_rgb(const Args& args, const std::optional<std::string_view>& name_override = {}) 
-  : unit::yuyv_to_rgb::Base(name_override)
+  : unit::yuyv_to_rgb::Base(args, name_override)
   {}
 
 

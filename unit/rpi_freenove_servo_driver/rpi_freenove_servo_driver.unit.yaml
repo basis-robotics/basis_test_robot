@@ -17,7 +17,9 @@ threading_model:
   single
 cpp_includes: 
   - google/protobuf/wrappers.pb.h
+  - foxglove/FrameTransforms.pb.h
   - basis_robot_input.pb.h
+
 
 handlers:
   Update:
@@ -38,7 +40,9 @@ handlers:
         type: protobuf:google::protobuf::DoubleValue
         optional: True
     outputs:
-      "/servo/0/current_degrees":
+      /servo/0/current_degrees:
         type: protobuf:google::protobuf::DoubleValue
-      "/servo/1/current_degrees":
+      /servo/1/current_degrees:
         type: protobuf:google::protobuf::DoubleValue
+      /tf2:
+        type: protobuf:foxglove.FrameTransforms

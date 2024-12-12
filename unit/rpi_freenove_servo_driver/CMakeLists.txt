@@ -1,3 +1,3 @@
 generate_unit(rpi_freenove_servo_driver)
     
-target_link_libraries(unit_rpi_freenove_servo_driver PiPCA9685_cpp basis_robot_input_proto)
+target_link_libraries(unit_rpi_freenove_servo_driver tf2_basis PiPCA9685_cpp basis_robot_input_proto)

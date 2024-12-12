@@ -163,7 +163,7 @@ void rpi_libcamera_driver::OnRequestComplete(libcamera::Request* request) {
 
     {
       std::unique_lock lock(next_output_lock);
-      next_output = std::make_shared<image_conversion::CpuImage>(image_conversion::PixelFormat::RGB, args.width, args.height, basis::core::MonotonicTime::FromNanoseconds(capture_monotonic), static_cast<std::byte *>(address));
+      next_output = std::make_shared<image_conversion::CpuImage>(image_conversion::PixelFormat::RGB, args.width, args.height, basis::core::MonotonicTime::FromNanoseconds(capture_monotonic), "camera", static_cast<std::byte *>(address));
     }
     
   }

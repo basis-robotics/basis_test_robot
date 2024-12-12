@@ -1,0 +1,22 @@
+args:
+  device:
+    type: string
+    help: The device to capture from
+    default: /dev/video0
+  topic_namespace:
+    type: string
+    default: /camera
+
+threading_model:
+  single
+cpp_includes:
+  - foxglove/FrameTransforms.pb.h
+
+handlers:
+  Publish:
+    sync:
+      type: all
+      rate: 1.0
+    outputs:
+      /tf2:
+        type: protobuf:foxglove.FrameTransforms
