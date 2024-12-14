@@ -30,7 +30,7 @@ float D2R(float degrees) {
 }
 
 float getAngle(uint16_t angle_z_q14) {
-  return D2R(angle_z_q14 * 90.f / 16384.f);
+  return D2R(360.0 * angle_z_q14 / 65536.0);
 }
 
 OnLidar::Output rplidar_driver::OnLidar(const OnLidar::Input& input) {
@@ -169,10 +169,6 @@ OnLidar::Output rplidar_driver::OnLidar(const OnLidar::Input& input) {
     float min = getAngle(nodes[0].angle_z_q14);
     float max = getAngle(nodes[node_count - 1].angle_z_q14);
     
-    if(min > max) {
-      std::swap(min, max);
-    }
-    
     // Usually min and max aren't straddling 0 radians - fix this
     if(max - min < M_PI)
     {
@@ -183,6 +179,9 @@ OnLidar::Output rplidar_driver::OnLidar(const OnLidar::Input& input) {
     out->set_start_angle(M_PI - min);
     out->set_end_angle(M_PI - max);
   }
+  BASIS_LOG_INFO("Test 0 {} -> {}", nodes[0].angle_z_q14, getAngle(nodes[0].angle_z_q14));
+  BASIS_LOG_INFO("Test {} {} -> {}", node_count - 1, nodes[node_count - 1].angle_z_q14, getAngle(nodes[node_count - 1].angle_z_q14));
+
   return {out};
 }
 
