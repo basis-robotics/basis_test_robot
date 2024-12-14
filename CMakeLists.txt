@@ -65,7 +65,7 @@ add_subdirectory(proto)
 
 add_subdirectory(unit/joystick_driver)
 add_subdirectory(unit/v4l2_camera_driver)
-
+add_subdirectory(unit/rplidar_driver)
 add_subdirectory(unit/static_transform_publisher)
 
 if(BASIS_PLATFORM STREQUAL "PI")
@@ -76,9 +76,9 @@ if(BASIS_PLATFORM STREQUAL "PI")
   )
   FetchContent_MakeAvailable(PiPCA9685)
 
-    add_subdirectory(unit/rpi_libcamera_driver)
-    add_subdirectory(unit/rpi_freenove_mecanum_driver)
-    add_subdirectory(unit/rpi_freenove_servo_driver)
+  add_subdirectory(unit/rpi_libcamera_driver)
+  add_subdirectory(unit/rpi_freenove_mecanum_driver)
+  add_subdirectory(unit/rpi_freenove_servo_driver)
 endif()
 
 if(CMAKE_CUDA_COMPILER)
