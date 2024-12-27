@@ -1,8 +1,3 @@
-/*
-
-  This is the starting point for your Unit. Edit this directly and implement the missing methods!
-
-*/
 #include <unit/rplidar_driver/unit_base.h>
 
 #include "sl_lidar.h" 

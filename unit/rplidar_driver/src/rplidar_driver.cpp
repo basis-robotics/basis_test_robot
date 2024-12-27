@@ -1,9 +1,3 @@
-/*
-
-  This is the starting point for your Unit. Edit this directly and implement the missing methods!
-
-*/
-
 #include <rplidar_driver.h>
 
 #include <google/protobuf/util/time_util.h>
