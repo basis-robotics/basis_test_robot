@@ -137,8 +137,6 @@ OnLidar::Output rplidar_driver::OnLidar(const OnLidar::Input& input) {
       return {};
   }
   
-  BASIS_LOG_DEBUG("Got scan with ts {} and count {}", timestamp, node_count);
-
   auto out = std::make_shared<foxglove::LaserScan>();
 
   *out->mutable_timestamp() = google::protobuf::util::TimeUtil::NanosecondsToTimestamp(timestamp);
@@ -173,8 +171,6 @@ OnLidar::Output rplidar_driver::OnLidar(const OnLidar::Input& input) {
     out->set_start_angle(M_PI - min);
     out->set_end_angle(M_PI - max);
   }
-  BASIS_LOG_INFO("Test 0 {} -> {}", nodes[0].angle_z_q14, getAngle(nodes[0].angle_z_q14));
-  BASIS_LOG_INFO("Test {} {} -> {}", node_count - 1, nodes[node_count - 1].angle_z_q14, getAngle(nodes[node_count - 1].angle_z_q14));
 
   return {out};
 }
