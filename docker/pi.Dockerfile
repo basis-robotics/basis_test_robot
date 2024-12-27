@@ -22,9 +22,10 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
         python3-dev \
         pkg-config
 
-# Probably not right
+# Probably not right - this adds the basis user into the correct groups for my pi - this might not work on others
 RUN groupadd -g 102 input && usermod -a -G input basis
 RUN groupadd -g 994 i2c && usermod -a -G i2c basis
+RUN usermod -a -G dialout basis
 
 USER basis
 ENV BASIS_PLATFORM=PI

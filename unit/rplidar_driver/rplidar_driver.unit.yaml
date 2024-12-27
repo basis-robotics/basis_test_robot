@@ -1,0 +1,24 @@
+args:
+  device:
+    type: string
+    help: The device to capture from
+    default: /dev/ttyUSB0
+  sensor_namespace:
+    type: string
+    default: /lidar
+
+threading_model:
+  single
+cpp_includes:
+  - foxglove/LaserScan.pb.h
+
+handlers:
+  OnLidar:
+    sync:
+      # All inputs are required (of which there are technically none)
+      type: all
+      # Run at 10fps
+      rate: 0.1
+    outputs:
+      "{{args.sensor_namespace}}/scan":
+        type: protobuf:foxglove.LaserScan
